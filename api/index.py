@@ -4,21 +4,33 @@ from pathlib import Path
 
 # Get the project root directory
 project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / "fixed_asset_register"))
+fixed_asset_path = project_root / "fixed_asset_register"
 
-# Set working directory to the app directory
-app_dir = project_root / "fixed_asset_register"
-os.chdir(str(app_dir))
+# Add paths to Python
+sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(fixed_asset_path))
+
+# Set working directory
+os.chdir(str(fixed_asset_path))
+
+# Set environment variable to prevent database initialization issues
+os.environ['FLASK_ENV'] = 'production'
 
 try:
-    # Import the Flask app
+    # Import Flask app
     from app import app
-except ImportError as e:
-    print(f"Error importing app: {e}")
-    raise
+    
+    # Disable debug mode for serverless
+    app.config['DEBUG'] = False
+    
+except Exception as e:
+    # Create a minimal app if import fails
+    from flask import Flask
+    app = Flask(__name__)
+    
+    @app.route('/')
+    def error():
+        return {'error': str(e), 'type': type(e).__name__}, 500
 
-# Vercel expects the app to be exported as 'app'
-# No need to wrap it - Vercel's Python runtime handles WSGI apps natively
 
 

@@ -43,7 +43,14 @@ from seed_data import seed_sample_data
 
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///assets.db"
+
+# Use in-memory database for serverless, file-based for local
+is_serverless = os.getenv('VERCEL') == '1' or os.getenv('AWS_LAMBDA_FUNCTION_NAME')
+if is_serverless:
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///assets.db"
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "university-fixed-asset-secret-key"
 app.config["WTF_CSRF_ENABLED"] = True
@@ -111,7 +118,12 @@ CATEGORY_CODE_MAP = {
 
 
 with app.app_context():
-    seed_sample_data()
+    try:
+        seed_sample_data()
+    except Exception as e:
+        # Database initialization failed - continue without seeding
+        # This is expected in serverless environments
+        app.logger.warning(f"Could not seed data: {e}")
 
 
 @app.before_request
