@@ -11,7 +11,8 @@
     </div>
     <div class="d-flex gap-2">
         <a href="{{ url_for('users_edit', id=user.id) }}" class="btn btn-warning btn-lg-action">Edit User</a>
-        <a href="{{ url_for('users_reset_password', id=user.id) }}" class="btn btn-outline-secondary btn-lg-action">Reset Password</a>
+        <a href="{{ url_for('users_reset_password', id=user.id) }}"
+            class="btn btn-outline-secondary btn-lg-action">Reset Password</a>
         <a href="{{ url_for('users_list') }}" class="btn btn-outline-primary btn-lg-action">Back to Users</a>
     </div>
 </div>
@@ -26,10 +27,14 @@
             <div class="profile-row"><span>Full Name</span><strong>{{ user.full_name }}</strong></div>
             <div class="profile-row"><span>Email</span><strong>{{ user.email }}</strong></div>
             <div class="profile-row"><span>Role</span><strong>{{ user.role|upper }}</strong></div>
-            <div class="profile-row"><span>Status</span><strong>{% if user.is_active %}Active{% else %}Inactive{% endif %}</strong></div>
-            <div class="profile-row"><span>Must Change Password</span><strong>{% if user.must_change_password %}Yes{% else %}No{% endif %}</strong></div>
-            <div class="profile-row"><span>Created At</span><strong>{{ user.created_at.strftime('%Y-%m-%d %H:%M') }}</strong></div>
-            <div class="profile-row"><span>Last Login</span><strong>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</strong></div>
+            <div class="profile-row"><span>Status</span><strong>{% if user.is_active %}Active{% else %}Inactive{% endif
+                    %}</strong></div>
+            <div class="profile-row"><span>Must Change Password</span><strong>{% if user.must_change_password %}Yes{%
+                    else %}No{% endif %}</strong></div>
+            <div class="profile-row"><span>Created At</span><strong>{{ user.created_at|as_bahrain('%Y-%m-%d %H:%M')
+                    }}</strong></div>
+            <div class="profile-row"><span>Last Login</span><strong>{{ user.last_login|as_bahrain('%Y-%m-%d %H:%M') if
+                    user.last_login else 'Never' }}</strong></div>
         </div>
     </div>
 </section>

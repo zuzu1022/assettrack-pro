@@ -10,45 +10,71 @@
         <p>Financial, compliance, and lifecycle indicators for enterprise fixed assets.</p>
     </div>
     {% if current_user and current_user.role == 'admin' %}
-    <a href="{{ url_for('add_asset') }}" class="btn btn-primary btn-lg-action"><i class="bi bi-plus-lg me-1"></i>Add New Asset</a>
+    <a href="{{ url_for('add_asset') }}" class="btn btn-primary btn-lg-action"><i class="bi bi-plus-lg me-1"></i>Add New
+        Asset</a>
     {% endif %}
 </div>
 
 <div class="kpi-grid">
-    <article class="kpi-card"><span class="kpi-label">Total Assets</span><strong class="kpi-value">{{ total_assets }}</strong><span class="kpi-foot">Registered assets</span></article>
-    <article class="kpi-card"><span class="kpi-label">Total Quantity</span><strong class="kpi-value">{{ total_quantity }}</strong><span class="kpi-foot">Total unit count</span></article>
-    <article class="kpi-card"><span class="kpi-label">Purchase Cost</span><strong class="kpi-value">{{ total_purchase_cost | bhd }}</strong><span class="kpi-foot">Historical acquisition</span></article>
-    <article class="kpi-card"><span class="kpi-label">Accumulated Depreciation</span><strong class="kpi-value">{{ total_accumulated_depreciation | bhd }}</strong><span class="kpi-foot">To date</span></article>
-    <article class="kpi-card"><span class="kpi-label">Net Book Value</span><strong class="kpi-value">{{ total_net_book_value | bhd }}</strong><span class="kpi-foot">Current carrying value</span></article>
-    <article class="kpi-card"><span class="kpi-label">Active Assets</span><strong class="kpi-value">{{ active_assets_count }}</strong><span class="kpi-foot">In-service assets</span></article>
-    <article class="kpi-card"><span class="kpi-label">Under Maintenance</span><strong class="kpi-value">{{ under_maintenance_assets_count }}</strong><span class="kpi-foot">Temporarily unavailable</span></article>
-    <article class="kpi-card"><span class="kpi-label">Disposed Assets</span><strong class="kpi-value">{{ disposed_assets_count }}</strong><span class="kpi-foot">Retired assets</span></article>
-    <article class="kpi-card"><span class="kpi-label">Pending Approvals</span><strong class="kpi-value">{{ pending_approval_count }}</strong><span class="kpi-foot">Submitted + review</span></article>
-    <article class="kpi-card"><span class="kpi-label">Pending Disposal Approvals</span><strong class="kpi-value">{{ pending_disposal_approval_count }}</strong><span class="kpi-foot">Awaiting decision</span></article>
-    <article class="kpi-card"><span class="kpi-label">Verification Discrepancies</span><strong class="kpi-value">{{ assets_with_discrepancies_count }}</strong><span class="kpi-foot">Mismatch / missing</span></article>
-    <article class="kpi-card"><span class="kpi-label">Maintenance Due</span><strong class="kpi-value">{{ assets_due_maintenance_count }}</strong><span class="kpi-foot">Assets due for service</span></article>
-    <article class="kpi-card"><span class="kpi-label">Maintenance Cost</span><strong class="kpi-value">{{ total_maintenance_cost | bhd }}</strong><span class="kpi-foot">Recorded spend</span></article>
-    <article class="kpi-card"><span class="kpi-label">Documents</span><strong class="kpi-value">{{ document_count }}</strong><span class="kpi-foot">Linked files</span></article>
-    <article class="kpi-card"><span class="kpi-label">Near End of Life</span><strong class="kpi-value">{{ nearing_end_assets_count }}</strong><span class="kpi-foot">Replacement planning</span></article>
+    <article class="kpi-card"><span class="kpi-label">Total Assets</span><strong class="kpi-value">{{ total_assets
+            }}</strong><span class="kpi-foot">Registered assets</span></article>
+    <article class="kpi-card"><span class="kpi-label">Total Quantity</span><strong class="kpi-value">{{ total_quantity
+            }}</strong><span class="kpi-foot">Total unit count</span></article>
+    <article class="kpi-card"><span class="kpi-label">Purchase Cost</span><strong class="kpi-value">{{
+            total_purchase_cost | bhd }}</strong><span class="kpi-foot">Historical acquisition</span></article>
+    <article class="kpi-card"><span class="kpi-label">Accumulated Depreciation</span><strong class="kpi-value">{{
+            total_accumulated_depreciation | bhd }}</strong><span class="kpi-foot">To date</span></article>
+    <article class="kpi-card"><span class="kpi-label">Net Book Value</span><strong class="kpi-value">{{
+            total_net_book_value | bhd }}</strong><span class="kpi-foot">Current carrying value</span></article>
+    <article class="kpi-card"><span class="kpi-label">Active Assets</span><strong class="kpi-value">{{
+            active_assets_count }}</strong><span class="kpi-foot">In-service assets</span></article>
+    <article class="kpi-card"><span class="kpi-label">Under Maintenance</span><strong class="kpi-value">{{
+            under_maintenance_assets_count }}</strong><span class="kpi-foot">Temporarily unavailable</span></article>
+    <article class="kpi-card"><span class="kpi-label">Disposed Assets</span><strong class="kpi-value">{{
+            disposed_assets_count }}</strong><span class="kpi-foot">Retired assets</span></article>
+    <article class="kpi-card"><span class="kpi-label">Pending Approvals</span><strong class="kpi-value">{{
+            pending_approval_count }}</strong><span class="kpi-foot">Submitted + review</span></article>
+    <article class="kpi-card"><span class="kpi-label">Pending Disposal Approvals</span><strong class="kpi-value">{{
+            pending_disposal_approval_count }}</strong><span class="kpi-foot">Awaiting decision</span></article>
+    <article class="kpi-card"><span class="kpi-label">Verification Discrepancies</span><strong class="kpi-value">{{
+            assets_with_discrepancies_count }}</strong><span class="kpi-foot">Mismatch / missing</span></article>
+    <article class="kpi-card"><span class="kpi-label">Maintenance Due</span><strong class="kpi-value">{{
+            assets_due_maintenance_count }}</strong><span class="kpi-foot">Assets due for service</span></article>
+    <article class="kpi-card"><span class="kpi-label">Maintenance Cost</span><strong class="kpi-value">{{
+            total_maintenance_cost | bhd }}</strong><span class="kpi-foot">Recorded spend</span></article>
+    <article class="kpi-card"><span class="kpi-label">Documents</span><strong class="kpi-value">{{ document_count
+            }}</strong><span class="kpi-foot">Linked files</span></article>
+    <article class="kpi-card"><span class="kpi-label">Near End of Life</span><strong class="kpi-value">{{
+            nearing_end_assets_count }}</strong><span class="kpi-foot">Replacement planning</span></article>
 </div>
 
 <div class="row g-3">
     <div class="col-xl-7">
         <section class="glass-panel h-100">
-            <header class="glass-head"><h5><i class="bi bi-clock-history me-2"></i>Most Recent Assets</h5></header>
+            <header class="glass-head">
+                <h5><i class="bi bi-clock-history me-2"></i>Most Recent Assets</h5>
+            </header>
             <div class="table-responsive premium-table-wrap">
                 <table class="table premium-table mb-0">
-                    <thead><tr><th>Code</th><th>Name</th><th>Status</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                    {% for asset in recent_assets %}
-                    <tr>
-                        <td>{{ asset.asset_code }}</td>
-                        <td><a href="{{ url_for('asset_detail', id=asset.id) }}" class="text-decoration-none fw-semibold">{{ asset.asset_name }}</a></td>
-                        <td><span class="badge status-{{ asset.status|lower|replace(' ', '-') }}">{{ asset.status }}</span></td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="3" class="text-center py-4 text-muted">No assets found.</td></tr>
-                    {% endfor %}
+                        {% for asset in recent_assets %}
+                        <tr>
+                            <td>{{ asset.asset_code }}</td>
+                            <td><a href="{{ url_for('asset_detail', id=asset.id) }}"
+                                    class="text-decoration-none fw-semibold">{{ asset.asset_name }}</a></td>
+                            <td><span class="badge status-{{ asset.status|lower|replace(' ', '-') }}">{{ asset.status
+                                    }}</span></td>
+                        <tr>
+                        <tr>
+                        <tr>
+                            <td>{{ log.timestamp|as_bahrain('%Y-%m-%d %H:%M') }}</td>
                     </tbody>
                 </table>
             </div>
@@ -57,20 +83,33 @@
 
     <div class="col-xl-5">
         <section class="glass-panel h-100">
-            <header class="glass-head"><h5><i class="bi bi-exclamation-diamond me-2"></i>Near End of Useful Life</h5></header>
+            <header class="glass-head">
+                <h5><i class="bi bi-exclamation-diamond me-2"></i>Near End of Useful Life</h5>
+            </header>
             <div class="table-responsive premium-table-wrap">
                 <table class="table premium-table mb-0">
-                    <thead><tr><th>Asset</th><th>Department</th><th>Remaining</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Asset</th>
+                            <th>Department</th>
+                            <th>Remaining</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                    {% for asset in nearing_end_assets %}
-                    <tr>
-                        <td><a href="{{ url_for('asset_detail', id=asset.id) }}" class="text-decoration-none fw-semibold">{{ asset.asset_name }}</a></td>
-                        <td>{{ asset.department }}</td>
-                        <td>{{ asset.remaining_useful_life }} year{{ 's' if asset.remaining_useful_life != 1 else '' }}</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="3" class="text-center py-4 text-muted">No assets currently near end of life.</td></tr>
-                    {% endfor %}
+                        {% for asset in nearing_end_assets %}
+                        <tr>
+                            <td><a href="{{ url_for('asset_detail', id=asset.id) }}"
+                                    class="text-decoration-none fw-semibold">{{ asset.asset_name }}</a></td>
+                            <td>{{ asset.department }}</td>
+                            <td>{{ asset.remaining_useful_life }} year{{ 's' if asset.remaining_useful_life != 1 else ''
+                                }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted">No assets currently near end of life.
+                            </td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -79,33 +118,80 @@
 </div>
 
 <div class="row g-3 mt-1">
-    <div class="col-xl-4"><section class="glass-panel"><header class="glass-head"><h5><i class="bi bi-pie-chart me-2"></i>Assets by Category</h5></header><div class="glass-body"><canvas id="categoryChart" height="150"></canvas></div></section></div>
-    <div class="col-xl-4"><section class="glass-panel"><header class="glass-head"><h5><i class="bi bi-bar-chart me-2"></i>Asset Status Mix</h5></header><div class="glass-body"><canvas id="statusChart" height="150"></canvas></div></section></div>
-    <div class="col-xl-4"><section class="glass-panel"><header class="glass-head"><h5><i class="bi bi-check2-square me-2"></i>Verification Summary</h5></header><div class="glass-body"><canvas id="verificationChart" height="150"></canvas></div></section></div>
+    <div class="col-xl-4">
+        <section class="glass-panel">
+            <header class="glass-head">
+                <h5><i class="bi bi-pie-chart me-2"></i>Assets by Category</h5>
+            </header>
+            <div class="glass-body"><canvas id="categoryChart" height="150"></canvas></div>
+        </section>
+    </div>
+    <div class="col-xl-4">
+        <section class="glass-panel">
+            <header class="glass-head">
+                <h5><i class="bi bi-bar-chart me-2"></i>Asset Status Mix</h5>
+            </header>
+            <div class="glass-body"><canvas id="statusChart" height="150"></canvas></div>
+        </section>
+    </div>
+    <div class="col-xl-4">
+        <section class="glass-panel">
+            <header class="glass-head">
+                <h5><i class="bi bi-check2-square me-2"></i>Verification Summary</h5>
+            </header>
+            <div class="glass-body"><canvas id="verificationChart" height="150"></canvas></div>
+        </section>
+    </div>
 </div>
 
 <div class="row g-3 mt-1">
-    <div class="col-xl-6"><section class="glass-panel"><header class="glass-head"><h5><i class="bi bi-building me-2"></i>Assets by Department</h5></header><div class="glass-body"><canvas id="departmentChart" height="170"></canvas></div></section></div>
-    <div class="col-xl-6"><section class="glass-panel"><header class="glass-head"><h5><i class="bi bi-currency-exchange me-2"></i>Depreciation by Department</h5></header><div class="glass-body"><canvas id="depreciationDepartmentChart" height="170"></canvas></div></section></div>
+    <div class="col-xl-6">
+        <section class="glass-panel">
+            <header class="glass-head">
+                <h5><i class="bi bi-building me-2"></i>Assets by Department</h5>
+            </header>
+            <div class="glass-body"><canvas id="departmentChart" height="170"></canvas></div>
+        </section>
+    </div>
+    <div class="col-xl-6">
+        <section class="glass-panel">
+            <header class="glass-head">
+                <h5><i class="bi bi-currency-exchange me-2"></i>Depreciation by Department</h5>
+            </header>
+            <div class="glass-body"><canvas id="depreciationDepartmentChart" height="170"></canvas></div>
+        </section>
+    </div>
 </div>
 
 <section class="glass-panel mt-3">
-    <header class="glass-head"><h5><i class="bi bi-activity me-2"></i>Recent Audit Log Entries</h5></header>
+    <header class="glass-head">
+        <h5><i class="bi bi-activity me-2"></i>Recent Audit Log Entries</h5>
+    </header>
     <div class="table-responsive premium-table-wrap">
         <table class="table premium-table mb-0">
-            <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Asset</th><th>Details</th></tr></thead>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Asset</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
             <tbody>
-            {% for log in recent_audit_logs %}
-            <tr>
-                <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>{{ log.username }}</td>
-                <td>{{ log.action|title }}</td>
-                <td>{{ log.asset_name or '—' }}</td>
-                <td>{{ log.details or '—' }}</td>
-            </tr>
-            {% else %}
-            <tr><td colspan="5" class="text-center py-4 text-muted">No recent audit activity.</td></tr>
-            {% endfor %}
+                {% for log in recent_audit_logs %}
+                <tr>
+                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ log.username }}</td>
+                    <td>{{ log.action|title }}</td>
+                    <td>{{ log.asset_name or '—' }}</td>
+                    <td>{{ log.details or '—' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">No recent audit activity.</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -125,41 +211,41 @@
 <script id="depr-dept-labels" type="application/json">{{ depreciation_department_labels|tojson }}</script>
 <script id="depr-dept-values" type="application/json">{{ depreciation_department_values|tojson }}</script>
 <script>
-const categoryLabels = JSON.parse(document.getElementById('category-chart-labels').textContent);
-const categoryValues = JSON.parse(document.getElementById('category-chart-values').textContent);
-const departmentLabels = JSON.parse(document.getElementById('department-chart-labels').textContent);
-const departmentValues = JSON.parse(document.getElementById('department-chart-values').textContent);
-const statusLabels = JSON.parse(document.getElementById('status-chart-labels').textContent);
-const statusValues = JSON.parse(document.getElementById('status-chart-values').textContent);
-const verificationLabels = JSON.parse(document.getElementById('verification-chart-labels').textContent);
-const verificationValues = JSON.parse(document.getElementById('verification-chart-values').textContent);
-const depreciationLabels = JSON.parse(document.getElementById('depr-dept-labels').textContent);
-const depreciationValues = JSON.parse(document.getElementById('depr-dept-values').textContent);
+    const categoryLabels = JSON.parse(document.getElementById('category-chart-labels').textContent);
+    const categoryValues = JSON.parse(document.getElementById('category-chart-values').textContent);
+    const departmentLabels = JSON.parse(document.getElementById('department-chart-labels').textContent);
+    const departmentValues = JSON.parse(document.getElementById('department-chart-values').textContent);
+    const statusLabels = JSON.parse(document.getElementById('status-chart-labels').textContent);
+    const statusValues = JSON.parse(document.getElementById('status-chart-values').textContent);
+    const verificationLabels = JSON.parse(document.getElementById('verification-chart-labels').textContent);
+    const verificationValues = JSON.parse(document.getElementById('verification-chart-values').textContent);
+    const depreciationLabels = JSON.parse(document.getElementById('depr-dept-labels').textContent);
+    const depreciationValues = JSON.parse(document.getElementById('depr-dept-values').textContent);
 
-new Chart(document.getElementById('categoryChart'), {
-    type: 'doughnut',
-    data: {labels: categoryLabels, datasets: [{data: categoryValues, backgroundColor: ['#4f82e6','#7c5cff','#00b8a9','#ff8a65','#ffd166','#6c757d']}]},
-    options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}
-});
-new Chart(document.getElementById('statusChart'), {
-    type: 'pie',
-    data: {labels: statusLabels, datasets: [{data: statusValues, backgroundColor: ['#16a34a','#f59e0b','#ef4444']}]},
-    options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {position: 'bottom'}}}
-});
-new Chart(document.getElementById('verificationChart'), {
-    type: 'polarArea',
-    data: {labels: verificationLabels, datasets: [{data: verificationValues, backgroundColor: ['#2563eb','#fb8c00','#e53935']}]},
-    options: {responsive: true, maintainAspectRatio: false}
-});
-new Chart(document.getElementById('departmentChart'), {
-    type: 'bar',
-    data: {labels: departmentLabels, datasets: [{label: 'Assets', data: departmentValues, backgroundColor: '#4f82e6', borderRadius: 6}]},
-    options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}}, scales: {y: {beginAtZero: true, ticks: {precision: 0}}}}
-});
-new Chart(document.getElementById('depreciationDepartmentChart'), {
-    type: 'bar',
-    data: {labels: depreciationLabels, datasets: [{label: 'Accumulated Depreciation (BHD)', data: depreciationValues, backgroundColor: '#7c5cff', borderRadius: 6}]},
-    options: {responsive: true, maintainAspectRatio: false, plugins: {legend: {display: false}}, scales: {y: {beginAtZero: true}}}
-});
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: { labels: categoryLabels, datasets: [{ data: categoryValues, backgroundColor: ['#4f82e6', '#7c5cff', '#00b8a9', '#ff8a65', '#ffd166', '#6c757d'] }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+    new Chart(document.getElementById('statusChart'), {
+        type: 'pie',
+        data: { labels: statusLabels, datasets: [{ data: statusValues, backgroundColor: ['#16a34a', '#f59e0b', '#ef4444'] }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+    new Chart(document.getElementById('verificationChart'), {
+        type: 'polarArea',
+        data: { labels: verificationLabels, datasets: [{ data: verificationValues, backgroundColor: ['#2563eb', '#fb8c00', '#e53935'] }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+    new Chart(document.getElementById('departmentChart'), {
+        type: 'bar',
+        data: { labels: departmentLabels, datasets: [{ label: 'Assets', data: departmentValues, backgroundColor: '#4f82e6', borderRadius: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+    new Chart(document.getElementById('depreciationDepartmentChart'), {
+        type: 'bar',
+        data: { labels: depreciationLabels, datasets: [{ label: 'Accumulated Depreciation (BHD)', data: depreciationValues, backgroundColor: '#7c5cff', borderRadius: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
 </script>
 {% endblock %}

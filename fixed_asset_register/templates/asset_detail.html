@@ -37,7 +37,7 @@
                     <div class="profile-row"><span>Category</span><strong>{{ asset.category }}</strong></div>
                     <div class="profile-row"><span>Department</span><strong>{{ asset.department }}</strong></div>
                     <div class="profile-row"><span>Quantity</span><strong>{{ asset.quantity }}</strong></div>
-                    <div class="profile-row"><span>Purchase Date</span><strong>{{ asset.purchase_date.strftime('%Y-%m-%d') }}</strong></div>
+                    <div class="profile-row"><span>Purchase Date</span><strong>{{ asset.purchase_date|as_bahrain('%Y-%m-%d') }}</strong></div>
                     <div class="profile-row"><span>Purchase Cost</span><strong>{{ asset.purchase_cost | bhd }}</strong></div>
                     <div class="profile-row"><span>Salvage Value</span><strong>{{ asset.salvage_value | bhd }}</strong></div>
                     <div class="profile-row"><span>Useful Life</span><strong>{{ asset.useful_life }} years</strong></div>
@@ -46,12 +46,12 @@
                     <div class="profile-row"><span>Serial Number</span><strong>{{ asset.serial_number or '—' }}</strong></div>
                     <div class="profile-row"><span>Location</span><strong>{{ asset.location or '—' }}</strong></div>
                     <div class="profile-row"><span>Condition</span><strong>{{ asset.asset_condition }}</strong></div>
-                    <div class="profile-row"><span>Warranty Expiry</span><strong>{{ asset.warranty_expiry.strftime('%Y-%m-%d') if asset.warranty_expiry else '—' }}</strong></div>
+                    <div class="profile-row"><span>Warranty Expiry</span><strong>{{ asset.warranty_expiry|as_bahrain('%Y-%m-%d') if asset.warranty_expiry else '—' }}</strong></div>
                     <div class="profile-row"><span>Status</span><strong><span class="badge status-{{ asset.status|lower|replace(' ', '-') }}">{{ asset.status }}</span></strong></div>
                     <div class="profile-row"><span>Transfer Workflow</span><strong>{% if latest_transfer_approval %}<span class="badge status-{{ latest_transfer_approval.status }}">{{ latest_transfer_approval.status_label }}</span>{% else %}—{% endif %}</strong></div>
                     {% if latest_transfer_approval %}
                     <div class="profile-row"><span>Transfer Target Dept.</span><strong>{{ latest_transfer_approval.target_department or '—' }}</strong></div>
-                    <div class="profile-row"><span>Transfer Requested On</span><strong>{{ latest_transfer_approval.transfer_date.strftime('%Y-%m-%d') if latest_transfer_approval.transfer_date else '—' }}</strong></div>
+                    <div class="profile-row"><span>Transfer Requested On</span><strong>{{ latest_transfer_approval.transfer_date|as_bahrain('%Y-%m-%d') if latest_transfer_approval.transfer_date else '—' }}</strong></div>
                     {% endif %}
                 </div>
             </div>
@@ -111,11 +111,11 @@
                     <tbody>
                     {% for row in maintenance_history %}
                         <tr>
-                            <td>{{ row.maintenance_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ row.maintenance_date|as_bahrain('%Y-%m-%d') }}</td>
                             <td>{{ row.maintenance_type }}</td>
                             <td>{{ row.service_provider }}</td>
                             <td>{{ row.maintenance_cost | bhd }}</td>
-                            <td>{{ row.next_maintenance_date.strftime('%Y-%m-%d') if row.next_maintenance_date else '—' }}</td>
+                            <td>{{ row.next_maintenance_date|as_bahrain('%Y-%m-%d') if row.next_maintenance_date else '—' }}</td>
                         </tr>
                     {% else %}
                         <tr><td colspan="5" class="text-center py-4 text-muted">No maintenance records found.</td></tr>
@@ -137,7 +137,7 @@
                     <tbody>
                     {% for row in verification_history %}
                         <tr>
-                            <td>{{ row.verification_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ row.verification_date|as_bahrain('%Y-%m-%d') }}</td>
                             <td><span class="badge status-{{ row.verification_status|replace('_','-') }}">{{ row.verification_status|replace('_',' ')|title }}</span></td>
                             <td>{{ row.expected_location }} / {{ row.expected_condition }}</td>
                             <td>{{ row.actual_location or '—' }} / {{ row.actual_condition or '—' }}</td>
@@ -166,7 +166,7 @@
                             <td>{{ row.document_type|replace('_', ' ')|title }}</td>
                             <td>{{ row.file_name }}</td>
                             <td>{{ row.uploaded_by }}</td>
-                            <td>{{ row.uploaded_at.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ row.uploaded_at|as_bahrain('%Y-%m-%d') }}</td>
                             <td><a href="{{ url_for('document_download', id=row.id) }}" class="btn btn-sm btn-outline-primary">Download</a></td>
                         </tr>
                     {% else %}
@@ -187,7 +187,7 @@
             <tbody>
             {% for log in related_audit_logs %}
                 <tr>
-                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ log.timestamp|as_bahrain('%Y-%m-%d %H:%M') }}</td>
                     <td>{{ log.username }}</td>
                     <td>{{ log.action|title }}</td>
                     <td>{{ log.details or '—' }}</td>
@@ -205,7 +205,7 @@
     <header class="glass-head"><h5><i class="bi bi-archive-fill me-2"></i>Disposal Details</h5></header>
     <div class="glass-body">
         <div class="profile-grid">
-            <div class="profile-row"><span>Disposal Date</span><strong>{{ asset.disposal_date.strftime('%Y-%m-%d') if asset.disposal_date else '—' }}</strong></div>
+            <div class="profile-row"><span>Disposal Date</span><strong>{{ asset.disposal_date|as_bahrain('%Y-%m-%d') if asset.disposal_date else '—' }}</strong></div>
             <div class="profile-row"><span>Disposal Value</span><strong>{{ (asset.disposal_value or 0) | bhd }}</strong></div>
             <div class="profile-row"><span>Reason</span><strong>{{ asset.disposal_reason or '—' }}</strong></div>
             <div class="profile-row"><span>Notes</span><strong>{{ asset.disposal_notes or '—' }}</strong></div>

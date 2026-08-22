@@ -9,7 +9,7 @@
         <p>All uploaded attachments linked to this fixed asset record.</p>
     </div>
     {% if current_user.role == 'admin' and not asset.is_disposed %}
-        <a href="{{ url_for('asset_document_upload', id=asset.id) }}" class="btn btn-primary btn-lg-action">Upload New</a>
+    <a href="{{ url_for('asset_document_upload', id=asset.id) }}" class="btn btn-primary btn-lg-action">Upload New</a>
     {% endif %}
 </div>
 
@@ -28,26 +28,28 @@
             </thead>
             <tbody>
                 {% for row in documents %}
-                    <tr>
-                        <td>{{ row.document_type|replace('_',' ')|title }}</td>
-                        <td>{{ row.file_name }}</td>
-                        <td>{{ row.notes or '—' }}</td>
-                        <td>{{ row.uploaded_by }}</td>
-                        <td>{{ row.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td class="d-flex gap-2">
-                            <a href="{{ url_for('document_download', id=row.id) }}" class="btn btn-sm btn-outline-primary">Download</a>
-                            {% if current_user.role == 'admin' and not asset.is_disposed %}
-                                <form method="POST" action="{{ url_for('document_delete', id=row.id) }}" onsubmit="return confirm('Delete this document?');">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                                </form>
-                            {% endif %}
-                        </td>
-                    </tr>
+                <tr>
+                    <td>{{ row.document_type|replace('_',' ')|title }}</td>
+                    <td>{{ row.file_name }}</td>
+                    <td>{{ row.notes or '—' }}</td>
+                    <td>{{ row.uploaded_by }}</td>
+                    <td>{{ row.uploaded_at|as_bahrain('%Y-%m-%d %H:%M') }}</td>
+                    <td class="d-flex gap-2">
+                        <a href="{{ url_for('document_download', id=row.id) }}"
+                            class="btn btn-sm btn-outline-primary">Download</a>
+                        {% if current_user.role == 'admin' and not asset.is_disposed %}
+                        <form method="POST" action="{{ url_for('document_delete', id=row.id) }}"
+                            onsubmit="return confirm('Delete this document?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
                 {% else %}
-                    <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">No documents uploaded.</td>
-                    </tr>
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">No documents uploaded.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -28,17 +28,21 @@
                 </tr>
             </thead>
             <tbody>
-            {% for log in logs %}
+                {% for log in logs %}
                 <tr>
-                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ log.timestamp|as_bahrain('%Y-%m-%d %H:%M:%S') }}</td>
                     <td>{{ log.username }}</td>
                     <td>{{ log.action|title }}</td>
-                    <td>{% if log.asset_id %}<a href="{{ url_for('asset_detail', id=log.asset_id) }}" class="text-decoration-none fw-semibold">{{ log.asset_name or ('Asset #' ~ log.asset_id) }}</a>{% else %}—{% endif %}</td>
+                    <td>{% if log.asset_id %}<a href="{{ url_for('asset_detail', id=log.asset_id) }}"
+                            class="text-decoration-none fw-semibold">{{ log.asset_name or ('Asset #' ~ log.asset_id)
+                            }}</a>{% else %}—{% endif %}</td>
                     <td>{{ log.details or '—' }}</td>
                 </tr>
-            {% else %}
-                <tr><td colspan="5" class="text-center py-4 text-muted">No audit entries available.</td></tr>
-            {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">No audit entries available.</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

@@ -5,6 +5,7 @@ import os
 import re
 import uuid
 from datetime import date, datetime
+from zoneinfo import ZoneInfo
 from functools import wraps
 
 from flask import (
@@ -217,6 +218,32 @@ def strip_html(value):
 
 def is_valid_email(email):
     return bool(re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email or ""))
+
+
+@app.template_filter('as_bahrain')
+def as_bahrain(value, fmt='%Y-%m-%d %H:%M'):
+    if value is None:
+        return ''
+    # Convert date to datetime at midnight
+    if isinstance(value, date) and not isinstance(value, datetime):
+        dt = datetime.combine(value, datetime.min.time())
+    elif isinstance(value, datetime):
+        dt = value
+    else:
+        try:
+            return str(value)
+        except Exception:
+            return ''
+
+    # Assume naive datetimes are UTC
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=ZoneInfo('UTC'))
+
+    try:
+        local = dt.astimezone(ZoneInfo('Asia/Bahrain'))
+        return local.strftime(fmt)
+    except Exception:
+        return dt.strftime(fmt)
 
 
 def hash_password(password):
@@ -1304,10 +1331,38 @@ def add_asset():
             )
 
         comments = strip_html(request.form.get("comments"))
+        if submission_mode == "draft":
+            # Create an Asset record directly for drafts so users can edit later
+            from models import Asset
+
+            new_asset = Asset(
+                asset_name=form_data["asset_name"],
+                asset_code=form_data["asset_code"],
+                category=form_data["category"],
+                department=form_data["department"],
+                purchase_date=form_data["purchase_date"],
+                quantity=form_data["quantity"] or 1,
+                purchase_cost=form_data["purchase_cost"] or 0.0,
+                salvage_value=form_data["salvage_value"] or 0.0,
+                useful_life=form_data["useful_life"] or 1,
+                status=form_data["status"] or "Active",
+                supplier=form_data.get("supplier"),
+                invoice_number=form_data.get("invoice_number"),
+                serial_number=form_data.get("serial_number"),
+                location=form_data.get("location"),
+                warranty_expiry=form_data.get("warranty_expiry"),
+                asset_condition=form_data.get("asset_condition") or "Good",
+            )
+            db.session.add(new_asset)
+            db.session.commit()
+            log_audit("create asset (draft)", asset=new_asset, details=f"Created draft asset {new_asset.asset_code} by user.")
+            flash("Asset saved as draft.", "success")
+            return redirect(url_for("asset_detail", id=new_asset.id))
+
         approval = create_approval_request(
             "asset_registration",
             payload=form_data,
-            status="draft" if submission_mode == "draft" else "submitted",
+            status="submitted",
             comments=comments,
         )
         log_audit(
@@ -1315,7 +1370,7 @@ def add_asset():
             details=f"Submitted asset registration approval request #{approval.id} with status {approval.status}.",
         )
         db.session.commit()
-        flash("Asset registration request saved." if approval.status == "draft" else "Asset registration submitted for approval.", "success")
+        flash("Asset registration submitted for approval.", "success")
         return redirect(url_for("approval_list"))
 
     return render_template(
