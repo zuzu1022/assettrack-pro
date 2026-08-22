@@ -1,10 +1,14 @@
 import os
 
+# Statically present top-level names for deployment detection
+application = None
+handler = None
+
 # Prefer a static import so hosting providers can statically detect the callable.
-# Import the Flask `app` from the package and expose it as `application` and `handler`.
 try:
-    from fixed_asset_register.app import app as application
-    handler = application
+    from fixed_asset_register.app import app as _imported_app
+    application = _imported_app
+    handler = _imported_app
 except Exception:
     # Minimal fallback if import fails at runtime; kept simple for static analysis.
     from flask import Flask, jsonify
