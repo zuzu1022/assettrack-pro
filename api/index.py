@@ -41,3 +41,19 @@ except Exception as e:
             'traceback': error_msg
         }), 500
 
+# Expose WSGI/ASGI callable names expected by various hosts (Vercel expects one of these)
+try:
+    application = app
+    handler = app
+    print("Exposed WSGI application as 'application' and 'handler'", flush=True)
+except NameError:
+    # Fallback minimal app if somehow `app` wasn't created
+    fallback = Flask(__name__)
+
+    @fallback.route('/')
+    def fallback_index():
+        return jsonify({'error': 'No application available'}), 500
+
+    application = fallback
+    handler = fallback
+
