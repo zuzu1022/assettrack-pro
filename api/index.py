@@ -12,7 +12,7 @@ sys.path.insert(0, str(root / "fixed_asset_register"))
 os.chdir(str(root / "fixed_asset_register"))
 
 # Import Flask
-from flask import Flask
+from flask import Flask, jsonify
 
 try:
     # Try importing the main app
@@ -22,17 +22,22 @@ try:
     app.config['DEBUG'] = False
     app.config['ENV'] = 'production'
     
+    print("Successfully imported main app from fixed_asset_register/app.py", flush=True)
+    
 except Exception as e:
     # Fallback to minimal app if import fails
-    print(f"Failed to import main app: {e}", flush=True)
+    import traceback
+    error_msg = traceback.format_exc()
+    print(f"Failed to import main app: {error_msg}", flush=True)
     
     app = Flask(__name__)
     
     @app.route('/')
     def error():
-        return {
+        return jsonify({
             'error': 'Failed to import main application',
             'message': str(e),
-            'type': type(e).__name__
-        }, 500
+            'type': type(e).__name__,
+            'traceback': error_msg
+        }), 500
 
