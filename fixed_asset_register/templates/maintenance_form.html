@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Maintenance - {{ asset.asset_name }}{% endblock %}
+
+{% block content %}
+<div class="page-banner mb-3">
+    <div>
+        <h2>Record Maintenance Event</h2>
+        <p>Capture service history to support lifecycle costing and compliance traceability.</p>
+    </div>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head"><h5>Maintenance Entry</h5></header>
+    <div class="glass-body">
+        <form method="POST" class="row g-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-6">
+                <label class="form-label">Asset</label>
+                <input type="text" class="form-control" value="{{ asset.asset_name }} ({{ asset.asset_code }})" disabled>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Date <span class="text-danger">*</span></label>
+                <input type="date" name="maintenance_date" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Cost <span class="text-danger">*</span></label>
+                <input type="number" step="0.001" min="0" name="maintenance_cost" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Type <span class="text-danger">*</span></label>
+                <select name="maintenance_type" class="form-select" required>
+                    <option value="Preventive">Preventive</option>
+                    <option value="Corrective">Corrective</option>
+                    <option value="Inspection">Inspection</option>
+                    <option value="Calibration">Calibration</option>
+                    <option value="Upgrade">Upgrade</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Service Provider <span class="text-danger">*</span></label>
+                <input type="text" name="service_provider" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Next Maintenance Date</label>
+                <input type="date" name="next_maintenance_date" class="form-control">
+            </div>
+            <div class="col-12">
+                <label class="form-label">Notes</label>
+                <textarea name="notes" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="col-12 d-flex justify-content-end gap-2">
+                <a href="{{ url_for('asset_detail', id=asset.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Maintenance</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

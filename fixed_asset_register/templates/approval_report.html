@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Approval Performance Report{% endblock %}
+
+{% block content %}
+<div class="page-banner mb-3">
+    <div>
+        <h2>Approval Performance Report</h2>
+        <p>Visibility into request types, throughput status, and control cycle outcomes.</p>
+    </div>
+    <a href="{{ url_for('export_approvals_csv') }}" class="btn btn-outline-primary btn-lg-action">Export CSV</a>
+</div>
+
+<div class="glass-panel">
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Asset</th>
+                    <th>Status</th>
+                    <th>Submitted By</th>
+                    <th>Reviewed/Approved By</th>
+                    <th>Submitted At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in approvals %}
+                    <tr>
+                        <td>#{{ row.id }}</td>
+                        <td>{{ row.request_type|replace('_',' ')|title }}</td>
+                        <td>{{ row.asset.asset_name if row.asset else 'New Registration' }}</td>
+                        <td><span class="badge status-{{ row.status|replace('_','-') }}">{{ row.status|replace('_',' ')|title }}</span></td>
+                        <td>{{ row.submitted_by.username }}</td>
+                        <td>{{ row.approved_by or row.reviewed_by or '—' }}</td>
+                        <td>{{ row.submission_date.strftime('%Y-%m-%d %H:%M') if row.submission_date else '—' }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No approval records found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

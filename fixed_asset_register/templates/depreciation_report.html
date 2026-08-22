@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Depreciation Report - AssetTrack Pro{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>Depreciation Intelligence Report</h2>
+        <p>Portfolio-level depreciation analytics with transparent carrying value positions.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('export_depreciation_csv') }}" class="btn btn-outline-primary btn-lg-action">Export CSV</a>
+        <a href="{{ url_for('asset_list') }}" class="btn btn-outline-primary btn-lg-action">Open Asset Register</a>
+    </div>
+</div>
+
+<div class="kpi-grid report-kpis">
+    <article class="kpi-card">
+        <span class="kpi-label">Total Purchase Cost</span>
+        <strong class="kpi-value">{{ totals.purchase_cost | bhd }}</strong>
+        <span class="kpi-foot">Base historical value</span>
+    </article>
+    <article class="kpi-card">
+        <span class="kpi-label">Accumulated Depreciation</span>
+        <strong class="kpi-value">{{ totals.accumulated_depreciation | bhd }}</strong>
+        <span class="kpi-foot">Depreciation already absorbed</span>
+    </article>
+    <article class="kpi-card">
+        <span class="kpi-label">Net Book Value</span>
+        <strong class="kpi-value">{{ totals.net_book_value | bhd }}</strong>
+        <span class="kpi-foot">Current remaining value</span>
+    </article>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head">
+        <h5><i class="bi bi-journal-text me-2"></i>Depreciation Ledger</h5>
+    </header>
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table table-striped mb-0">
+            <thead>
+            <tr>
+                <th>Asset Code</th>
+                <th>Asset Name</th>
+                <th>Purchase Cost</th>
+                <th>Salvage Value</th>
+                <th>Useful Life</th>
+                <th>Yrs Used</th>
+                <th>Annual Depr.</th>
+                <th>Accumulated Depr.</th>
+                <th>Net Book Value</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for asset in assets %}
+                <tr>
+                    <td>{{ asset.asset_code }}</td>
+                    <td>{{ asset.asset_name }}</td>
+                    <td>{{ asset.purchase_cost | bhd }}</td>
+                    <td>{{ asset.salvage_value | bhd }}</td>
+                    <td>{{ asset.useful_life }}</td>
+                    <td>{{ asset.years_used }}</td>
+                    <td>{{ asset.annual_depreciation | bhd }}</td>
+                    <td>{{ asset.accumulated_depreciation | bhd }}</td>
+                    <td class="fw-bold">{{ asset.net_book_value | bhd }}</td>
+                    <td><span class="badge status-{{ asset.status|lower|replace(' ', '-') }}">{{ asset.status }}</span></td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="10" class="text-center py-4 text-muted">No assets available.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

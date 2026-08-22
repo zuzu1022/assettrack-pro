@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block title %}Asset Detail - {{ asset.asset_name }}{% endblock %}
+{% block page_title %}Asset Detail{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>Asset Intelligence Profile</h2>
+        <p>Enterprise control view with lifecycle, approvals, maintenance, verification, and document governance.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        {% if current_user and current_user.role == 'admin' %}
+            {% if not asset.is_disposed %}
+                <a href="{{ url_for('edit_asset', id=asset.id) }}" class="btn btn-warning btn-lg-action">Edit Asset</a>
+                <a href="{{ url_for('transfer_asset', id=asset.id) }}" class="btn btn-outline-primary btn-lg-action">Transfer Request</a>
+                <a href="{{ url_for('dispose_asset', id=asset.id) }}" class="btn btn-outline-danger btn-lg-action">Disposal Request</a>
+                <a href="{{ url_for('asset_maintenance_new', id=asset.id) }}" class="btn btn-outline-primary btn-lg-action">Add Maintenance</a>
+                <a href="{{ url_for('asset_verify', id=asset.id) }}" class="btn btn-outline-primary btn-lg-action">Record Verification</a>
+                <a href="{{ url_for('asset_document_upload', id=asset.id) }}" class="btn btn-outline-primary btn-lg-action">Upload Document</a>
+            {% endif %}
+        {% endif %}
+        <a href="{{ url_for('asset_documents_list', id=asset.id) }}" class="btn btn-outline-secondary btn-lg-action">Documents</a>
+        <a href="{{ url_for('asset_maintenance_list', id=asset.id) }}" class="btn btn-outline-secondary btn-lg-action">Maintenance</a>
+        <a href="{{ url_for('asset_list') }}" class="btn btn-outline-secondary btn-lg-action">Back to Register</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-8">
+        <section class="glass-panel h-100">
+            <header class="glass-head"><h5><i class="bi bi-person-vcard me-2"></i>Master Information</h5></header>
+            <div class="glass-body">
+                <div class="profile-grid">
+                    <div class="profile-row"><span>Asset Name</span><strong>{{ asset.asset_name }}</strong></div>
+                    <div class="profile-row"><span>Asset Code</span><strong>{{ asset.asset_code }}</strong></div>
+                    <div class="profile-row"><span>Category</span><strong>{{ asset.category }}</strong></div>
+                    <div class="profile-row"><span>Department</span><strong>{{ asset.department }}</strong></div>
+                    <div class="profile-row"><span>Quantity</span><strong>{{ asset.quantity }}</strong></div>
+                    <div class="profile-row"><span>Purchase Date</span><strong>{{ asset.purchase_date.strftime('%Y-%m-%d') }}</strong></div>
+                    <div class="profile-row"><span>Purchase Cost</span><strong>{{ asset.purchase_cost | bhd }}</strong></div>
+                    <div class="profile-row"><span>Salvage Value</span><strong>{{ asset.salvage_value | bhd }}</strong></div>
+                    <div class="profile-row"><span>Useful Life</span><strong>{{ asset.useful_life }} years</strong></div>
+                    <div class="profile-row"><span>Supplier</span><strong>{{ asset.supplier or '—' }}</strong></div>
+                    <div class="profile-row"><span>Invoice Number</span><strong>{{ asset.invoice_number or '—' }}</strong></div>
+                    <div class="profile-row"><span>Serial Number</span><strong>{{ asset.serial_number or '—' }}</strong></div>
+                    <div class="profile-row"><span>Location</span><strong>{{ asset.location or '—' }}</strong></div>
+                    <div class="profile-row"><span>Condition</span><strong>{{ asset.asset_condition }}</strong></div>
+                    <div class="profile-row"><span>Warranty Expiry</span><strong>{{ asset.warranty_expiry.strftime('%Y-%m-%d') if asset.warranty_expiry else '—' }}</strong></div>
+                    <div class="profile-row"><span>Status</span><strong><span class="badge status-{{ asset.status|lower|replace(' ', '-') }}">{{ asset.status }}</span></strong></div>
+                    <div class="profile-row"><span>Transfer Workflow</span><strong>{% if latest_transfer_approval %}<span class="badge status-{{ latest_transfer_approval.status }}">{{ latest_transfer_approval.status_label }}</span>{% else %}—{% endif %}</strong></div>
+                    {% if latest_transfer_approval %}
+                    <div class="profile-row"><span>Transfer Target Dept.</span><strong>{{ latest_transfer_approval.target_department or '—' }}</strong></div>
+                    <div class="profile-row"><span>Transfer Requested On</span><strong>{{ latest_transfer_approval.transfer_date.strftime('%Y-%m-%d') if latest_transfer_approval.transfer_date else '—' }}</strong></div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-xl-4">
+        <section class="glass-panel">
+            <header class="glass-head"><h5><i class="bi bi-graph-down-arrow me-2"></i>Depreciation Snapshot</h5></header>
+            <div class="glass-body">
+                <div class="snapshot-list">
+                    <article class="snapshot-item"><small>Years Used</small><strong>{{ asset.years_used }} yr{{ 's' if asset.years_used != 1 else '' }}</strong></article>
+                    <article class="snapshot-item"><small>Annual Depreciation</small><strong>{{ asset.annual_depreciation | bhd }}</strong></article>
+                    <article class="snapshot-item"><small>Accumulated Depreciation</small><strong>{{ asset.accumulated_depreciation | bhd }}</strong></article>
+                    <article class="snapshot-item"><small>Net Book Value</small><strong class="text-success">{{ asset.net_book_value | bhd }}</strong></article>
+                    <article class="snapshot-item"><small>Total Maintenance Cost</small><strong>{{ total_maintenance_cost | bhd }}</strong></article>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-xl-6">
+        <section class="glass-panel h-100">
+            <header class="glass-head"><h5><i class="bi bi-check2-square me-2"></i>Approval Workflow History</h5></header>
+            <div class="table-responsive premium-table-wrap">
+                <table class="table premium-table mb-0">
+                    <thead><tr><th>ID</th><th>Type</th><th>Status</th><th>Submitted</th><th>Reviewed/Approved</th></tr></thead>
+                    <tbody>
+                    {% for row in approval_history %}
+                        <tr>
+                            <td>#{{ row.id }}</td>
+                            <td>{{ row.request_type.replace('_', ' ')|title }}</td>
+                            <td><span class="badge status-{{ row.status|replace('_', '-') }}">{{ row.status|replace('_', ' ')|title }}</span></td>
+                            <td>{{ row.submitted_by }}<br><small class="text-muted">{{ row.submission_date.strftime('%Y-%m-%d %H:%M') }}</small></td>
+                            <td>{{ row.approved_by or row.reviewed_by or '—' }}</td>
+                        </tr>
+                        {% if row.rejection_reason %}
+                            <tr><td colspan="5" class="text-danger small">Rejection Reason: {{ row.rejection_reason }}</td></tr>
+                        {% endif %}
+                    {% else %}
+                        <tr><td colspan="5" class="text-center py-4 text-muted">No approval records found.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-xl-6">
+        <section class="glass-panel h-100">
+            <header class="glass-head"><h5><i class="bi bi-tools me-2"></i>Maintenance History</h5></header>
+            <div class="table-responsive premium-table-wrap">
+                <table class="table premium-table mb-0">
+                    <thead><tr><th>Date</th><th>Type</th><th>Provider</th><th>Cost</th><th>Next Due</th></tr></thead>
+                    <tbody>
+                    {% for row in maintenance_history %}
+                        <tr>
+                            <td>{{ row.maintenance_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ row.maintenance_type }}</td>
+                            <td>{{ row.service_provider }}</td>
+                            <td>{{ row.maintenance_cost | bhd }}</td>
+                            <td>{{ row.next_maintenance_date.strftime('%Y-%m-%d') if row.next_maintenance_date else '—' }}</td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5" class="text-center py-4 text-muted">No maintenance records found.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-xl-6">
+        <section class="glass-panel h-100">
+            <header class="glass-head"><h5><i class="bi bi-clipboard2-check me-2"></i>Verification History</h5></header>
+            <div class="table-responsive premium-table-wrap">
+                <table class="table premium-table mb-0">
+                    <thead><tr><th>Date</th><th>Status</th><th>Expected</th><th>Actual</th></tr></thead>
+                    <tbody>
+                    {% for row in verification_history %}
+                        <tr>
+                            <td>{{ row.verification_date.strftime('%Y-%m-%d') }}</td>
+                            <td><span class="badge status-{{ row.verification_status|replace('_','-') }}">{{ row.verification_status|replace('_',' ')|title }}</span></td>
+                            <td>{{ row.expected_location }} / {{ row.expected_condition }}</td>
+                            <td>{{ row.actual_location or '—' }} / {{ row.actual_condition or '—' }}</td>
+                        </tr>
+                        {% if row.discrepancy_notes %}
+                            <tr><td colspan="4" class="text-muted small">{{ row.discrepancy_notes }}</td></tr>
+                        {% endif %}
+                    {% else %}
+                        <tr><td colspan="4" class="text-center py-4 text-muted">No verification records found.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-xl-6">
+        <section class="glass-panel h-100">
+            <header class="glass-head"><h5><i class="bi bi-folder2-open me-2"></i>Document Attachments</h5></header>
+            <div class="table-responsive premium-table-wrap">
+                <table class="table premium-table mb-0">
+                    <thead><tr><th>Type</th><th>File</th><th>Uploaded By</th><th>Date</th><th>Action</th></tr></thead>
+                    <tbody>
+                    {% for row in documents %}
+                        <tr>
+                            <td>{{ row.document_type|replace('_', ' ')|title }}</td>
+                            <td>{{ row.file_name }}</td>
+                            <td>{{ row.uploaded_by }}</td>
+                            <td>{{ row.uploaded_at.strftime('%Y-%m-%d') }}</td>
+                            <td><a href="{{ url_for('document_download', id=row.id) }}" class="btn btn-sm btn-outline-primary">Download</a></td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="5" class="text-center py-4 text-muted">No documents uploaded.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+<section class="glass-panel mt-4">
+    <header class="glass-head"><h5><i class="bi bi-shield-check me-2"></i>Audit Trail</h5></header>
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table mb-0">
+            <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead>
+            <tbody>
+            {% for log in related_audit_logs %}
+                <tr>
+                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ log.username }}</td>
+                    <td>{{ log.action|title }}</td>
+                    <td>{{ log.details or '—' }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4" class="text-center py-4 text-muted">No audit activity recorded.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% if asset.is_disposed %}
+<section class="glass-panel mt-4">
+    <header class="glass-head"><h5><i class="bi bi-archive-fill me-2"></i>Disposal Details</h5></header>
+    <div class="glass-body">
+        <div class="profile-grid">
+            <div class="profile-row"><span>Disposal Date</span><strong>{{ asset.disposal_date.strftime('%Y-%m-%d') if asset.disposal_date else '—' }}</strong></div>
+            <div class="profile-row"><span>Disposal Value</span><strong>{{ (asset.disposal_value or 0) | bhd }}</strong></div>
+            <div class="profile-row"><span>Reason</span><strong>{{ asset.disposal_reason or '—' }}</strong></div>
+            <div class="profile-row"><span>Notes</span><strong>{{ asset.disposal_notes or '—' }}</strong></div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

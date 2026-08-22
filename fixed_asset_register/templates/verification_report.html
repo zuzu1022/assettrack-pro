@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Verification Report{% endblock %}
+
+{% block content %}
+<div class="page-banner mb-3">
+    <div>
+        <h2>Physical Verification Report</h2>
+        <p>Centralized oversight of verification outcomes and discrepancy trends.</p>
+    </div>
+    <a href="{{ url_for('export_verifications_csv') }}" class="btn btn-outline-primary btn-lg-action">Export CSV</a>
+</div>
+
+<div class="glass-panel">
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Asset</th>
+                    <th>Code</th>
+                    <th>Status</th>
+                    <th>Expected</th>
+                    <th>Actual</th>
+                    <th>Verified By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in verifications %}
+                    {% set verification_status = (row.verification_status or 'missing') %}
+                    {% set expected_location = (row.expected_location or '')|trim %}
+                    {% if not expected_location %}
+                        {% set expected_location = ((row.asset.location if row.asset else None) or (row.asset.department if row.asset else None) or '—') %}
+                    {% endif %}
+                    {% set expected_condition = (row.expected_condition or '')|trim %}
+                    {% if not expected_condition %}
+                        {% set expected_condition = ((row.asset.asset_condition if row.asset else None) or '—') %}
+                    {% endif %}
+                    <tr>
+                        <td>{{ row.verification_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ row.asset.asset_name if row.asset else '—' }}</td>
+                        <td>{{ row.asset.asset_code if row.asset else '—' }}</td>
+                        <td><span class="badge status-{{ verification_status|replace('_','-') }}">{{ verification_status|friendly_status }}</span></td>
+                        <td>{{ expected_location }} / {{ expected_condition }}</td>
+                        <td>{{ row.actual_location or '—' }} / {{ row.actual_condition or '—' }}</td>
+                        <td>{{ row.verified_by }}</td>
+                    </tr>
+                    {% if row.discrepancy_notes %}
+                        <tr>
+                            <td colspan="7" class="text-muted small">Notes: {{ row.discrepancy_notes }}</td>
+                        </tr>
+                    {% endif %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No verification records found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

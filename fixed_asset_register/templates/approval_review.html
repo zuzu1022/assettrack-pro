@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Approval Review #{{ approval.id }}{% endblock %}
+{% block page_title %}Approval Review{% endblock %}
+
+{% block content %}
+<div class="page-banner mb-3">
+    <div>
+        <h2>Approval Review</h2>
+        <p>Evaluate workflow payload and complete approval decision control.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <section class="glass-panel h-100">
+            <header class="glass-head"><h5>Request Summary</h5></header>
+            <div class="glass-body">
+                <div class="profile-grid">
+                    <div class="profile-row"><span>Request ID</span><strong>#{{ approval.id }}</strong></div>
+                    <div class="profile-row"><span>Type</span><strong>{{ approval.request_type|replace('_',' ')|title }}</strong></div>
+                    <div class="profile-row"><span>Status</span><strong><span class="badge status-{{ approval.status|replace('_','-') }}">{{ approval.status|replace('_',' ')|title }}</span></strong></div>
+                    <div class="profile-row"><span>Submitted By</span><strong>{{ approval.submitted_by }}</strong></div>
+                    <div class="profile-row"><span>Submitted At</span><strong>{{ approval.submission_date.strftime('%Y-%m-%d %H:%M') }}</strong></div>
+                    {% if approval.asset %}
+                        <div class="profile-row"><span>Asset</span><strong>{{ approval.asset.asset_name }} ({{ approval.asset.asset_code }})</strong></div>
+                    {% endif %}
+                    {% if approval.comments %}
+                        <div class="profile-row"><span>Submission Comments</span><strong>{{ approval.comments }}</strong></div>
+                    {% endif %}
+                    {% if approval.rejection_reason %}
+                        <div class="profile-row"><span>Rejection Reason</span><strong class="text-danger">{{ approval.rejection_reason }}</strong></div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-lg-5">
+        <section class="glass-panel h-100">
+            <header class="glass-head"><h5>Payload</h5></header>
+            <div class="glass-body">
+                <pre class="small mb-0" style="white-space: pre-wrap;">{{ payload | tojson(indent=2) }}</pre>
+            </div>
+        </section>
+    </div>
+</div>
+
+{% if current_user.role == 'admin' and approval.status in ['submitted', 'under_review'] %}
+<section class="glass-panel mt-4">
+    <header class="glass-head"><h5>Decision</h5></header>
+    <div class="glass-body">
+        <form method="POST" class="row g-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-6">
+                <label class="form-label">Action <span class="text-danger">*</span></label>
+                <select class="form-select" name="decision" required>
+                    <option value="approved">Approve</option>
+                    <option value="under_review">Move to Under Review</option>
+                    <option value="rejected">Reject</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Review Notes</label>
+                <textarea class="form-control" name="review_comments" rows="3" placeholder="Optional notes"></textarea>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Rejection Reason (required if rejected)</label>
+                <textarea class="form-control" name="rejection_reason" rows="2" placeholder="Provide rejection reason"></textarea>
+            </div>
+            <div class="col-12 d-flex justify-content-end">
+                <button type="submit" class="btn btn-success">Submit Decision</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

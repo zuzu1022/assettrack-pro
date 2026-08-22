@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form_mode == 'create' %}Create User{% else %}Edit User{% endif %} - AssetTrack Pro{% endblock %}
+{% block page_title %}User Form{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>{% if form_mode == 'create' %}Create User{% else %}Edit User{% endif %}</h2>
+        <p>Configure identity details, role assignment, and account status.</p>
+    </div>
+    <a href="{{ url_for('users_list') }}" class="btn btn-outline-secondary btn-lg-action">Back to Users</a>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head">
+        <h5><i class="bi bi-person-vcard me-2"></i>User Profile Form</h5>
+    </header>
+    <div class="glass-body">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="row g-3 filter-grid">
+                <div class="col-md-6">
+                    <label for="username" class="form-label">Username</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="username"
+                        name="username"
+                        required
+                        {% if form_mode == 'edit' %}readonly{% endif %}
+                        value="{{ form_data.get('username', user.username if user else '') }}"
+                    >
+                    {% if form_mode == 'edit' %}
+                        <div class="form-text">Username cannot be changed after creation.</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label for="full_name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="full_name" name="full_name" required value="{{ form_data.get('full_name', user.full_name if user else '') }}">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required value="{{ form_data.get('email', user.email if user else '') }}">
+                </div>
+
+                <div class="col-md-6">
+                    <label for="role" class="form-label">Role</label>
+                    {% set selected_role = form_data.get('role', user.role if user else 'viewer') %}
+                    <select id="role" name="role" class="form-select" required>
+                        {% for role in roles %}
+                            <option value="{{ role }}" {% if selected_role == role %}selected{% endif %}>{{ role|upper }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {% if form_mode == 'create' %}
+                    <div class="col-md-6">
+                        <label for="temporary_password" class="form-label">Temporary Password</label>
+                        <input type="password" class="form-control" id="temporary_password" name="temporary_password" required minlength="8" autocomplete="new-password">
+                        <div class="form-text">User will be forced to change password at next login.</div>
+                    </div>
+                {% endif %}
+
+                <div class="col-md-6">
+                    {% set active_checked = form_data.get('is_active') == 'on' if form_data else (user.is_active if user else True) %}
+                    <label class="form-label d-block">Account Status</label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="is_active" name="is_active" {% if active_checked %}checked{% endif %}>
+                        <label class="form-check-label" for="is_active">Active account</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions mt-4">
+                <a href="{{ url_for('users_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">{% if form_mode == 'create' %}Create User{% else %}Update User{% endif %}</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

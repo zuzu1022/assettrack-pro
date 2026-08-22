@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}User Management - AssetTrack Pro{% endblock %}
+{% block page_title %}User Management{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>User Management</h2>
+        <p>Manage application accounts, access roles, and security status.</p>
+    </div>
+    <a href="{{ url_for('users_new') }}" class="btn btn-primary btn-lg-action"><i class="bi bi-person-plus me-1"></i>Add User</a>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head">
+        <h5><i class="bi bi-people me-2"></i>System Users</h5>
+    </header>
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table align-middle mb-0">
+            <thead>
+            <tr>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Password Policy</th>
+                <th>Last Login</th>
+                <th class="text-end">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td class="fw-semibold">{{ user.username }}</td>
+                    <td>{{ user.full_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td><span class="badge {% if user.role == 'admin' %}text-bg-primary{% else %}text-bg-secondary{% endif %}">{{ user.role|upper }}</span></td>
+                    <td>
+                        {% if user.is_active %}
+                            <span class="badge status-active">Active</span>
+                        {% else %}
+                            <span class="badge status-disposed">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.must_change_password %}
+                            <span class="badge text-bg-warning">Must Change</span>
+                        {% else %}
+                            <span class="badge text-bg-success">OK</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}</td>
+                    <td class="text-end">
+                        <a href="{{ url_for('users_detail', id=user.id) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                        <a href="{{ url_for('users_edit', id=user.id) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                        <a href="{{ url_for('users_reset_password', id=user.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-key"></i></a>
+                        <form action="{{ url_for('users_toggle_active', id=user.id) }}" method="POST" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm {% if user.is_active %}btn-outline-dark{% else %}btn-outline-success{% endif %}">
+                                <i class="bi {% if user.is_active %}bi-pause-circle{% else %}bi-play-circle{% endif %}"></i>
+                            </button>
+                        </form>
+                        <form action="{{ url_for('users_delete', id=user.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this user account?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center py-5 text-muted">No users found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

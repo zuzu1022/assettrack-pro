@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Assets - AssetTrack Pro{% endblock %}
+{% block page_title %}Assets{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>Asset Register Workspace</h2>
+        <p>Comprehensive ledger with filtering, control actions and lifecycle visibility.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('export_assets_csv', **filters) }}" class="btn btn-outline-primary btn-lg-action"><i class="bi bi-download me-1"></i>Export CSV</a>
+        {% if current_user and current_user.role == 'admin' %}
+        <a href="{{ url_for('add_asset') }}" class="btn btn-primary btn-lg-action"><i class="bi bi-plus-lg me-1"></i>Add Asset</a>
+        {% endif %}
+    </div>
+</div>
+
+<section class="glass-panel mb-3">
+    <header class="glass-head"><h5><i class="bi bi-sliders me-2"></i>Search, Filters & Sorting</h5></header>
+    <div class="glass-body">
+        <form method="GET" action="{{ url_for('asset_list') }}" class="row g-3 filter-grid">
+            <div class="col-md-4"><label for="search" class="form-label">Search</label><input type="text" id="search" name="search" class="form-control" value="{{ filters.search }}" placeholder="Asset name or code"></div>
+            <div class="col-md-2"><label for="category" class="form-label">Category</label><select id="category" name="category" class="form-select"><option value="">All</option>{% for item in categories %}<option value="{{ item }}" {% if filters.category == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+            <div class="col-md-2"><label for="department" class="form-label">Department</label><select id="department" name="department" class="form-select"><option value="">All</option>{% for item in departments %}<option value="{{ item }}" {% if filters.department == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+            <div class="col-md-2"><label for="status" class="form-label">Status</label><select id="status" name="status" class="form-select"><option value="">All</option>{% for item in status_options %}<option value="{{ item }}" {% if filters.status == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+            <div class="col-md-2"><label for="supplier" class="form-label">Supplier</label><select id="supplier" name="supplier" class="form-select"><option value="">All</option>{% for item in suppliers %}<option value="{{ item }}" {% if filters.supplier == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+            <div class="col-md-2"><label for="condition" class="form-label">Condition</label><select id="condition" name="condition" class="form-select"><option value="">All</option>{% for item in condition_options %}<option value="{{ item }}" {% if filters.condition == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+            <div class="col-md-2"><label for="start_date" class="form-label">Purchase From</label><input type="date" id="start_date" name="start_date" class="form-control" value="{{ filters.start_date }}"></div>
+            <div class="col-md-2"><label for="end_date" class="form-label">Purchase To</label><input type="date" id="end_date" name="end_date" class="form-control" value="{{ filters.end_date }}"></div>
+            <div class="col-md-2"><label for="min_cost" class="form-label">Min Cost</label><input type="number" id="min_cost" name="min_cost" min="0" step="0.001" class="form-control" value="{{ filters.min_cost }}"></div>
+            <div class="col-md-2"><label for="max_cost" class="form-label">Max Cost</label><input type="number" id="max_cost" name="max_cost" min="0" step="0.001" class="form-control" value="{{ filters.max_cost }}"></div>
+            <div class="col-md-2"><label for="sort_by" class="form-label">Sort By</label><select id="sort_by" name="sort_by" class="form-select"><option value="asset_name" {% if filters.sort_by == 'asset_name' %}selected{% endif %}>Asset Name</option><option value="purchase_date" {% if filters.sort_by == 'purchase_date' %}selected{% endif %}>Purchase Date</option><option value="purchase_cost" {% if filters.sort_by == 'purchase_cost' %}selected{% endif %}>Purchase Cost</option><option value="department" {% if filters.sort_by == 'department' %}selected{% endif %}>Department</option><option value="status" {% if filters.sort_by == 'status' %}selected{% endif %}>Status</option></select></div>
+            <div class="col-md-2"><label for="sort_dir" class="form-label">Direction</label><select id="sort_dir" name="sort_dir" class="form-select"><option value="asc" {% if filters.sort_dir == 'asc' %}selected{% endif %}>Ascending</option><option value="desc" {% if filters.sort_dir == 'desc' %}selected{% endif %}>Descending</option></select></div>
+            <div class="col-md-2 d-flex align-items-end gap-2"><button type="submit" class="btn btn-primary w-100">Apply</button><a href="{{ url_for('asset_list') }}" class="btn btn-outline-secondary w-100">Reset</a></div>
+        </form>
+    </div>
+</section>
+
+<section class="glass-panel">
+    <header class="glass-head"><h5><i class="bi bi-table me-2"></i>Asset Records</h5></header>
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table align-middle mb-0">
+            <thead>
+            <tr>
+                <th>Asset Code</th><th>Asset Name</th><th>Category</th><th>Department</th><th>Qty</th><th>Supplier</th><th>Purchase Cost</th><th>Annual Depr.</th><th>Net Book Value</th><th>Status</th><th class="text-end asset-actions-col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for asset in assets %}
+            <tr>
+                <td>{{ asset.asset_code }}</td>
+                <td class="fw-semibold">{{ asset.asset_name }}</td>
+                <td>{{ asset.category }}</td>
+                <td>
+                    {{ asset.department }}
+                    {% set transfer_workflow = latest_transfer_status_by_asset.get(asset.id) %}
+                    {% if transfer_workflow %}
+                        <br><small class="text-muted">Transfer: <span class="badge status-{{ transfer_workflow.status }}">{{ transfer_workflow.status_label }}</span></small>
+                    {% endif %}
+                </td>
+                <td>{{ asset.quantity }}</td>
+                <td>{{ asset.supplier or '—' }}</td>
+                <td>{{ asset.purchase_cost | bhd }}</td>
+                <td>{{ asset.annual_depreciation | bhd }}</td>
+                <td class="fw-bold">{{ asset.net_book_value | bhd }}</td>
+                <td><span class="badge status-{{ asset.status|lower|replace(' ', '-') }}">{{ asset.status }}</span></td>
+                <td class="text-end asset-actions-cell">
+                    <div class="asset-actions">
+                        <a href="{{ url_for('asset_detail', id=asset.id) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                        {% if current_user and current_user.role == 'admin' %}
+                            {% if not asset.is_disposed %}
+                                <a href="{{ url_for('edit_asset', id=asset.id) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{{ url_for('transfer_asset', id=asset.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-left-right"></i></a>
+                                <a href="{{ url_for('dispose_asset', id=asset.id) }}" class="btn btn-sm btn-outline-danger"><i class="bi bi-archive"></i></a>
+                            {% endif %}
+                            <form action="{{ url_for('delete_asset', id=asset.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this asset?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="11" class="text-center py-5 text-muted">No assets found for selected filters.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

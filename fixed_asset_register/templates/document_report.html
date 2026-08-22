@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Document Compliance Report{% endblock %}
+
+{% block content %}
+<div class="page-banner mb-3">
+    <div>
+        <h2>Document Compliance Coverage</h2>
+        <p>Assess document completeness and evidence quality by asset record.</p>
+    </div>
+    <a href="{{ url_for('export_documents_csv') }}" class="btn btn-outline-primary btn-lg-action">Export CSV</a>
+</div>
+
+<div class="glass-panel">
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Asset</th>
+                    <th>Asset Code</th>
+                    <th>Type</th>
+                    <th>File</th>
+                    <th>Uploaded By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in documents %}
+                    <tr>
+                        <td>{{ row.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ row.asset.asset_name }}</td>
+                        <td>{{ row.asset.asset_code }}</td>
+                        <td>{{ row.document_type|replace('_',' ')|title }}</td>
+                        <td>{{ row.file_name }}</td>
+                        <td>{{ row.uploaded_by }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No document records found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

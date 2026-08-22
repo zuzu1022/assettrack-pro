@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Maintenance History - {{ asset.asset_name }}{% endblock %}
+
+{% block content %}
+<div class="page-banner mb-3">
+    <div>
+        <h2>Maintenance History</h2>
+        <p>Complete maintenance ledger for {{ asset.asset_name }} ({{ asset.asset_code }}).</p>
+    </div>
+    {% if current_user.role == 'admin' %}
+        <a href="{{ url_for('asset_maintenance_new', id=asset.id) }}" class="btn btn-primary btn-lg-action">Add Maintenance</a>
+    {% endif %}
+</div>
+
+<div class="glass-panel">
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Provider</th>
+                    <th>Cost</th>
+                    <th>Next Due</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in records %}
+                    <tr>
+                        <td>{{ row.maintenance_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ row.maintenance_type }}</td>
+                        <td>{{ row.service_provider }}</td>
+                        <td>{{ row.maintenance_cost | bhd }}</td>
+                        <td>{{ row.next_maintenance_date.strftime('%Y-%m-%d') if row.next_maintenance_date else '—' }}</td>
+                        <td>{{ row.notes or '—' }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No maintenance records found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

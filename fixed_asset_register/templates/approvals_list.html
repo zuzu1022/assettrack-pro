@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Approvals Queue{% endblock %}
+{% block page_title %}Approvals{% endblock %}
+
+{% block content %}
+<div class="page-banner mb-3">
+    <div>
+        <h2>Approval Workflow Queue</h2>
+        <p>Review and monitor pending and completed finance asset workflow requests.</p>
+    </div>
+</div>
+
+<div class="glass-panel">
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Asset</th>
+                    <th>Status</th>
+                    <th>Submitted By</th>
+                    <th>Submitted At</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in approvals %}
+                    <tr>
+                        <td>#{{ item.id }}</td>
+                        <td>{{ item.request_type|replace('_',' ')|title }}</td>
+                        <td>{{ item.asset.asset_name if item.asset else 'New Asset Registration' }}</td>
+                        <td><span class="badge status-{{ item.status|replace('_','-') }}">{{ item.status|replace('_',' ')|title }}</span></td>
+                        <td>{{ item.submitted_by }}</td>
+                        <td>{{ item.submission_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('approval_review', id=item.id) }}" class="btn btn-sm btn-outline-primary">Open</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No approval requests found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

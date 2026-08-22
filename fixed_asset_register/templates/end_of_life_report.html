@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}End of Life Report - AssetTrack Pro{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>Assets Near End of Useful Life</h2>
+        <p>Assets with very low or zero remaining useful life for replacement planning.</p>
+    </div>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-lg-action">Back to Dashboard</a>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head">
+        <h5><i class="bi bi-exclamation-diamond me-2"></i>End-of-Life Assets</h5>
+    </header>
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table mb-0">
+            <thead>
+                <tr>
+                    <th>Asset Code</th>
+                    <th>Asset Name</th>
+                    <th>Department</th>
+                    <th>Useful Life</th>
+                    <th>Years Used</th>
+                    <th>Remaining</th>
+                    <th>Net Book Value</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for asset in assets %}
+                <tr>
+                    <td>{{ asset.asset_code }}</td>
+                    <td><a href="{{ url_for('asset_detail', id=asset.id) }}" class="text-decoration-none fw-semibold">{{ asset.asset_name }}</a></td>
+                    <td>{{ asset.department }}</td>
+                    <td>{{ asset.useful_life }}</td>
+                    <td>{{ asset.years_used }}</td>
+                    <td>{{ asset.remaining_useful_life }}</td>
+                    <td>{{ asset.net_book_value | bhd }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7" class="text-center py-4 text-muted">No assets currently near end of life.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

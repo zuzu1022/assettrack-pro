@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Audit Logs - AssetTrack Pro{% endblock %}
+{% block page_title %}Audit Logs{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>Audit Logs</h2>
+        <p>Chronological activity records for authentication, user administration, and asset lifecycle events.</p>
+    </div>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-lg-action">Back to Dashboard</a>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head">
+        <h5><i class="bi bi-clock-history me-2"></i>System Activity</h5>
+    </header>
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table mb-0">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Asset</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ log.username }}</td>
+                    <td>{{ log.action|title }}</td>
+                    <td>{% if log.asset_id %}<a href="{{ url_for('asset_detail', id=log.asset_id) }}" class="text-decoration-none fw-semibold">{{ log.asset_name or ('Asset #' ~ log.asset_id) }}</a>{% else %}—{% endif %}</td>
+                    <td>{{ log.details or '—' }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5" class="text-center py-4 text-muted">No audit entries available.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

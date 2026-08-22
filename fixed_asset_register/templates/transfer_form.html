@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Transfer Asset - AssetTrack Pro{% endblock %}
+{% block page_title %}Transfer Asset{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>Transfer Asset</h2>
+        <p>Submit transfer workflow for approval before final department reassignment.</p>
+    </div>
+    <a href="{{ url_for('asset_detail', id=asset.id) }}" class="btn btn-outline-secondary btn-lg-action">Back to Asset</a>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head">
+        <h5><i class="bi bi-arrow-left-right me-2"></i>{{ asset.asset_name }}</h5>
+    </header>
+    <div class="glass-body">
+        {% if latest_transfer_approval %}
+        <div class="alert alert-success mb-3" role="alert">
+            Latest transfer request: <strong>#{{ latest_transfer_approval.id }}</strong> —
+            <span class="badge status-{{ latest_transfer_approval.status }}">{{ latest_transfer_approval.status_label }}</span>
+            {% if latest_transfer_approval.target_department %}
+                to <strong>{{ latest_transfer_approval.target_department }}</strong>
+            {% endif %}
+        </div>
+        {% endif %}
+        <form method="POST" class="row g-3 filter-grid">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-6">
+                <label class="form-label">Current Department</label>
+                <input type="text" class="form-control" value="{{ asset.department }}" disabled>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="new_department">New Department</label>
+                <select class="form-select" id="new_department" name="new_department" required>
+                    <option value="">Select department</option>
+                    {% for department in departments %}
+                        <option value="{{ department }}" {% if form_data.get('new_department') == department %}selected{% endif %}>{{ department }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="transfer_date">Transfer Date</label>
+                <input type="date" class="form-control" id="transfer_date" name="transfer_date" required value="{{ form_data.get('transfer_date', '') }}">
+            </div>
+            <div class="col-md-12">
+                <label class="form-label" for="reason">Reason</label>
+                <textarea class="form-control" id="reason" name="reason" rows="4" required>{{ form_data.get('reason', '') }}</textarea>
+            </div>
+            <div class="col-md-12">
+                <label class="form-label" for="comments">Approval Comments</label>
+                <textarea class="form-control" id="comments" name="comments" rows="2">{{ form_data.get('comments', '') }}</textarea>
+            </div>
+            <div class="form-actions mt-4">
+                <a href="{{ url_for('asset_detail', id=asset.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" name="submission_mode" value="draft" class="btn btn-outline-primary">Save as Draft</button>
+                <button type="submit" name="submission_mode" value="submitted" class="btn btn-primary">Submit for Approval</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

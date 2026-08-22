@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Department Summary Report - AssetTrack Pro{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>Department Summary Report</h2>
+        <p>Department-wise asset counts and value exposure.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('export_departments_csv') }}" class="btn btn-outline-primary btn-lg-action">Export CSV</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-lg-action">Back to Dashboard</a>
+    </div>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head">
+        <h5><i class="bi bi-diagram-3 me-2"></i>Department Ledger</h5>
+    </header>
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table mb-0">
+            <thead>
+                <tr>
+                    <th>Department</th>
+                    <th>Asset Count</th>
+                    <th>Total Purchase Cost</th>
+                    <th>Total Salvage Value</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in summary %}
+                <tr>
+                    <td>{{ row.department }}</td>
+                    <td>{{ row.asset_count }}</td>
+                    <td>{{ (row.purchase_total or 0) | bhd }}</td>
+                    <td>{{ (row.salvage_total or 0) | bhd }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4" class="text-center py-4 text-muted">No department records found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

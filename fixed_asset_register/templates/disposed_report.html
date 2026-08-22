@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Disposed Assets Report - AssetTrack Pro{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>Disposed Assets Report</h2>
+        <p>Closed lifecycle assets with final disposal values and supporting reasons.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('export_disposed_assets_csv') }}" class="btn btn-outline-primary btn-lg-action">Export CSV</a>
+        <a href="{{ url_for('asset_list') }}" class="btn btn-outline-secondary btn-lg-action">Open Asset Register</a>
+    </div>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head">
+        <h5><i class="bi bi-archive-fill me-2"></i>Disposed Asset Ledger</h5>
+    </header>
+    <div class="table-responsive premium-table-wrap">
+        <table class="table premium-table mb-0">
+            <thead>
+            <tr>
+                <th>Asset Code</th>
+                <th>Asset Name</th>
+                <th>Department</th>
+                <th>Disposal Date</th>
+                <th>Reason</th>
+                <th>Disposal Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for asset in assets %}
+                <tr>
+                    <td>{{ asset.asset_code }}</td>
+                    <td><a href="{{ url_for('asset_detail', id=asset.id) }}" class="text-decoration-none fw-semibold">{{ asset.asset_name }}</a></td>
+                    <td>{{ asset.department }}</td>
+                    <td>{{ asset.disposal_date.strftime('%Y-%m-%d') if asset.disposal_date else '—' }}</td>
+                    <td>{{ asset.disposal_reason or '—' }}</td>
+                    <td>{{ (asset.disposal_value or 0) | bhd }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="text-center py-5 text-muted">No disposed assets available.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

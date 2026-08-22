@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Physical Verification - {{ asset.asset_name }}{% endblock %}
+
+{% block content %}
+<div class="page-banner mb-3">
+    <div>
+        <h2>Physical Verification Entry</h2>
+        <p>Record periodic physical checks and discrepancy results for audit readiness.</p>
+    </div>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head"><h5>Verification Form</h5></header>
+    <div class="glass-body">
+        <form method="POST" class="row g-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-6">
+                <label class="form-label">Asset</label>
+                <input type="text" class="form-control" value="{{ asset.asset_name }} ({{ asset.asset_code }})" disabled>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Verification Date <span class="text-danger">*</span></label>
+                <input type="date" name="verification_date" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status <span class="text-danger">*</span></label>
+                <select name="verification_status" class="form-select" required>
+                    <option value="verified">Verified</option>
+                    <option value="discrepancy">Discrepancy</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Expected Location</label>
+                <input type="text" name="expected_location" class="form-control" value="{{ asset.location or asset.department or '' }}" readonly>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Actual Location</label>
+                <input type="text" name="actual_location" class="form-control" placeholder="Enter actual location">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Expected Condition</label>
+                <input type="text" name="expected_condition" class="form-control" value="{{ asset.asset_condition }}" readonly>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Actual Condition</label>
+                <input type="text" name="actual_condition" class="form-control" placeholder="Enter actual condition">
+            </div>
+
+            <div class="col-12">
+                <label class="form-label">Discrepancy Notes</label>
+                <textarea name="discrepancy_notes" class="form-control" rows="3" placeholder="Required when discrepancy exists"></textarea>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end gap-2">
+                <a href="{{ url_for('asset_detail', id=asset.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Verification</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

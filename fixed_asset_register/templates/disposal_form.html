@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Dispose Asset - AssetTrack Pro{% endblock %}
+{% block page_title %}Dispose Asset{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>Dispose Asset</h2>
+        <p>Submit disposal workflow for approval before retirement is finalized.</p>
+    </div>
+    <a href="{{ url_for('asset_detail', id=asset.id) }}" class="btn btn-outline-secondary btn-lg-action">Back to Asset</a>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head">
+        <h5><i class="bi bi-archive me-2"></i>{{ asset.asset_name }}</h5>
+    </header>
+    <div class="glass-body">
+        <form method="POST" class="row g-3 filter-grid">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-6">
+                <label class="form-label" for="disposal_date">Disposal Date</label>
+                <input type="date" class="form-control" id="disposal_date" name="disposal_date" required value="{{ form_data.get('disposal_date', '') }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="disposal_value">Disposal Value (BHD)</label>
+                <input type="number" class="form-control" id="disposal_value" name="disposal_value" min="0" step="0.001" value="{{ form_data.get('disposal_value', '0') }}">
+            </div>
+            <div class="col-md-12">
+                <label class="form-label" for="disposal_reason">Disposal Reason</label>
+                <input type="text" class="form-control" id="disposal_reason" name="disposal_reason" required value="{{ form_data.get('disposal_reason', '') }}">
+            </div>
+            <div class="col-md-12">
+                <label class="form-label" for="disposal_notes">Disposal Notes</label>
+                <textarea class="form-control" id="disposal_notes" name="disposal_notes" rows="4">{{ form_data.get('disposal_notes', '') }}</textarea>
+            </div>
+            <div class="col-md-12">
+                <label class="form-label" for="comments">Approval Comments</label>
+                <textarea class="form-control" id="comments" name="comments" rows="2">{{ form_data.get('comments', '') }}</textarea>
+            </div>
+            <div class="form-actions mt-4">
+                <a href="{{ url_for('asset_detail', id=asset.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" name="submission_mode" value="draft" class="btn btn-outline-primary">Save as Draft</button>
+                <button type="submit" name="submission_mode" value="submitted" class="btn btn-danger">Submit for Approval</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

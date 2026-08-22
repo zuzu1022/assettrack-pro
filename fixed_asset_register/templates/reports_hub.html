@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports - AssetTrack Pro{% endblock %}
+{% block page_title %}Reports{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>Reporting Center</h2>
+        <p>Access finance, compliance, lifecycle, governance, and document intelligence reports from one polished reporting workspace.</p>
+    </div>
+</div>
+
+<section class="reports-center-panel">
+    <div class="reports-center-head">
+        <div>
+            <span class="reports-center-eyebrow">Reporting Workspace</span>
+            <h3>Operational, finance, and compliance reporting</h3>
+            <p>Select a report to review depreciation performance, lifecycle exposure, verification results, and departmental trends.</p>
+        </div>
+    </div>
+
+    <div class="report-grid">
+        {% for report in report_links %}
+            {% if report.endpoint == 'depreciation_report' %}
+                {% set report_description = 'Review acquisition cost, accumulated depreciation, and current carrying value across registered assets.' %}
+            {% elif report.endpoint == 'depreciation_scenario' %}
+                {% set report_description = 'Model depreciation assumptions and compare scenario outcomes for planning and controls.' %}
+            {% elif report.endpoint == 'department_report' %}
+                {% set report_description = 'Analyze asset distribution, cost exposure, and ownership by department.' %}
+            {% elif report.endpoint == 'disposed_assets_report' %}
+                {% set report_description = 'Inspect retired assets, disposal values, dates, and supporting reasons.' %}
+            {% elif report.endpoint == 'end_of_life_report' %}
+                {% set report_description = 'Identify assets approaching the end of useful life to support replacement planning.' %}
+            {% elif report.endpoint == 'verification_report' %}
+                {% set report_description = 'Track verification outcomes, discrepancies, and asset accountability findings.' %}
+            {% elif report.endpoint == 'maintenance_report' %}
+                {% set report_description = 'Review service history, maintenance burden, and provider activity across assets.' %}
+            {% elif report.endpoint == 'approvals_report' %}
+                {% set report_description = 'Monitor approval pipeline activity, submission status, and decision turnaround.' %}
+            {% elif report.endpoint == 'documents_report' %}
+                {% set report_description = 'Access document coverage insights for invoices, warranties, evidence, and support files.' %}
+            {% else %}
+                {% set report_description = 'Open detailed reporting output for this reporting area.' %}
+            {% endif %}
+
+            <article class="report-card">
+                <div class="report-card-top">
+                    <div class="report-icon-badge"><i class="bi {{ report.icon }}"></i></div>
+                    <span class="report-card-tag">Enterprise Report</span>
+                </div>
+
+                <div class="report-card-body">
+                    <h4 class="report-card-title">{{ report.label }}</h4>
+                    <p class="report-card-description">{{ report_description }}</p>
+                </div>
+
+                <div class="report-card-actions">
+                    <a href="{{ url_for(report.endpoint) }}" class="btn btn-primary report-open-btn">Open Report</a>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

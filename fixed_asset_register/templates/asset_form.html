@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ form_title }} - AssetTrack Pro{% endblock %}
+{% block page_title %}Asset Form{% endblock %}
+
+{% block content %}
+<div class="page-banner">
+    <div>
+        <h2>{{ form_title }}</h2>
+        <p>Use standardized fields to keep the asset ledger clean, auditable, and valuation-ready.</p>
+    </div>
+    <a href="{{ url_for('asset_list') }}" class="btn btn-outline-secondary btn-lg-action">Back to Register</a>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head">
+        <h5><i class="bi bi-input-cursor-text me-2"></i>Asset Submission Form</h5>
+    </header>
+    <div class="glass-body">
+        <form method="POST" id="asset-form" data-edit-mode="{{ 'true' if asset else 'false' }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="auto-preview-panel mb-4">
+                <div class="auto-preview-head">
+                    <h6><i class="bi bi-magic me-2"></i>Auto-calculated Preview</h6>
+                    <span>Generated from your form values</span>
+                </div>
+                <div class="auto-preview-grid">
+                    <div class="preview-card preview-wide">
+                        <small>Generated Asset Code</small>
+                        <strong id="asset_code_preview_text">{{ generated_code if generated_code else 'Will appear automatically' }}</strong>
+                        <input type="hidden" id="asset_code" name="asset_code" value="{{ generated_code if generated_code else (asset.asset_code if asset else '') }}">
+                    </div>
+                    <div class="preview-card preview-wide">
+                        <small>Generated Invoice Number</small>
+                        <strong id="invoice_number_preview_text">{{ generated_invoice if generated_invoice else 'Generated automatically on save' }}</strong>
+                    </div>
+                    <div class="preview-card">
+                        <small>Annual Depreciation</small>
+                        <strong id="annual_depreciation_preview">BD 0.000</strong>
+                    </div>
+                    <div class="preview-card">
+                        <small>Initial Net Book Value</small>
+                        <strong id="net_book_value_preview">BD 0.000</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 filter-grid">
+                <div class="col-md-6">
+                    <label class="form-label" for="asset_name">Asset Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="asset_name" name="asset_name" required
+                           value="{{ form_data.get('asset_name', asset.asset_name if asset else '') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Asset Code Rule</label>
+                    <div class="form-static-note">Code is generated automatically using department, category, and running sequence, for example OPS-VEH-004.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="category">Category <span class="text-danger">*</span></label>
+                    {% set selected_category = form_data.get('category', asset.category if asset else '') %}
+                    <select class="form-select" id="category" name="category" required>
+                        <option value="">Select category</option>
+                        {% for item in categories %}
+                            <option value="{{ item }}" {% if selected_category == item %}selected{% endif %}>{{ item }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="department">Department <span class="text-danger">*</span></label>
+                    {% set selected_department = form_data.get('department', asset.department if asset else '') %}
+                    <select class="form-select" id="department" name="department" required>
+                        <option value="">Select department</option>
+                        {% for item in departments %}
+                            <option value="{{ item }}" {% if selected_department == item %}selected{% endif %}>{{ item }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="purchase_date">Purchase Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="purchase_date" name="purchase_date" required
+                           value="{{ form_data.get('purchase_date', asset.purchase_date.strftime('%Y-%m-%d') if asset else '') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="quantity">Quantity <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="quantity" name="quantity" min="1" step="1" required
+                           value="{{ form_data.get('quantity', asset.quantity if asset else 1) }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="useful_life">Useful Life (Years) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="useful_life" name="useful_life" min="1" required
+                           value="{{ form_data.get('useful_life', asset.useful_life if asset else '') }}">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="purchase_cost">Purchase Cost (BHD) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="purchase_cost" name="purchase_cost" min="0" step="0.001" required
+                           value="{{ form_data.get('purchase_cost', asset.purchase_cost if asset else '') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="salvage_value">Salvage Value (BHD)</label>
+                    <input type="number" class="form-control" id="salvage_value" name="salvage_value" min="0" step="0.001"
+                           value="{{ form_data.get('salvage_value', asset.salvage_value if asset else '') }}">
+                    <div class="form-text mt-1">Optional. Leave blank if unknown and the system will use 0.000.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="status">Status <span class="text-danger">*</span></label>
+                    <select class="form-select" id="status" name="status" required>
+                        {% set selected_status = form_data.get('status', asset.status if asset else 'Active') %}
+                        {% for option in status_options %}
+                            <option value="{{ option }}" {% if selected_status == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="supplier">Supplier</label>
+                    <input type="text" class="form-control" id="supplier" name="supplier"
+                           value="{{ form_data.get('supplier', asset.supplier if asset else '') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="invoice_number">Invoice Number</label>
+                      <input type="text" class="form-control" id="invoice_number" name="invoice_number" readonly
+                          value="{{ asset.invoice_number if asset else generated_invoice }}">
+                      <div class="form-text mt-1">Invoice number is generated automatically by the system.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="serial_number">Serial Number</label>
+                    <input type="text" class="form-control" id="serial_number" name="serial_number"
+                           value="{{ form_data.get('serial_number', asset.serial_number if asset else '') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="location">Location</label>
+                    <input type="text" class="form-control" id="location" name="location"
+                           value="{{ form_data.get('location', asset.location if asset else '') }}">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="warranty_expiry">Warranty Expiry</label>
+                    <input type="date" class="form-control" id="warranty_expiry" name="warranty_expiry"
+                           value="{{ form_data.get('warranty_expiry', asset.warranty_expiry.strftime('%Y-%m-%d') if asset and asset.warranty_expiry else '') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="asset_condition">Condition <span class="text-danger">*</span></label>
+                    {% set selected_condition = form_data.get('asset_condition', asset.asset_condition if asset else 'Good') %}
+                    <select class="form-select" id="asset_condition" name="asset_condition" required>
+                        {% for option in condition_options %}
+                            <option value="{{ option }}" {% if selected_condition == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions mt-4">
+                <a href="{{ url_for('asset_list') }}" class="btn btn-outline-secondary">Cancel</a>
+                {% if not asset %}
+                    <button type="submit" name="submission_mode" value="draft" class="btn btn-outline-primary">Save as Draft</button>
+                    <button type="submit" name="submission_mode" value="submitted" class="btn btn-primary">{{ submit_label }}</button>
+                {% else %}
+                    <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+                {% endif %}
+            </div>
+
+            {% if not asset %}
+                <div class="mt-3">
+                    <label class="form-label" for="comments">Submission Comments</label>
+                    <textarea id="comments" name="comments" class="form-control" rows="2" placeholder="Optional context for approval reviewers.">{{ form_data.get('comments', '') }}</textarea>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        const assetForm = document.getElementById('asset-form');
+        const categoryInput = document.getElementById('category');
+        const departmentInput = document.getElementById('department');
+        const purchaseDateInput = document.getElementById('purchase_date');
+        const purchaseCostInput = document.getElementById('purchase_cost');
+        const salvageValueInput = document.getElementById('salvage_value');
+        const usefulLifeInput = document.getElementById('useful_life');
+        const assetCodeInput = document.getElementById('asset_code');
+        const assetCodePreviewText = document.getElementById('asset_code_preview_text');
+        const invoicePreviewText = document.getElementById('invoice_number_preview_text');
+        const annualPreview = document.getElementById('annual_depreciation_preview');
+        const nbvPreview = document.getElementById('net_book_value_preview');
+
+        const isEditMode = assetForm.dataset.editMode === 'true';
+
+        function segment(value, fallback) {
+            const tokens = (value || '').toUpperCase().match(/[A-Z0-9]+/g) || [];
+            if (!tokens.length) return fallback;
+            if (tokens.length >= 2) {
+                return tokens.slice(0, 3).map(token => token[0]).join('').slice(0, 4);
+            }
+            return tokens[0].slice(0, 3);
+        }
+
+        function formatBhd(value) {
+            const numeric = Number.isFinite(value) ? value : 0;
+            return `BD ${numeric.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}`;
+        }
+
+        function updateAssetCodePreview() {
+            if (isEditMode) {
+                assetCodePreviewText.textContent = assetCodeInput.value || 'Existing asset code retained';
+                return;
+            }
+
+            const category = categoryInput.value.trim();
+            const department = departmentInput.value.trim();
+            const purchaseDate = purchaseDateInput.value;
+
+            if (!category || !department || !purchaseDate) {
+                if (!category || !department) {
+                    assetCodeInput.value = '';
+                    assetCodePreviewText.textContent = 'Will appear automatically';
+                    return;
+                }
+
+                assetCodeInput.value = `${segment(department, 'DEP')}-${segment(category, 'CAT')}-###`;
+                assetCodePreviewText.textContent = assetCodeInput.value;
+                return;
+            }
+
+            if (!category || !department) {
+                assetCodeInput.value = '';
+                assetCodePreviewText.textContent = 'Will appear automatically';
+                return;
+            }
+
+            assetCodeInput.value = `${segment(department, 'DEP')}-${segment(category, 'CAT')}-###`;
+            assetCodePreviewText.textContent = assetCodeInput.value;
+        }
+
+        function updateInvoicePreview() {
+            if (isEditMode) return;
+
+            const today = new Date();
+            const yyyy = today.getFullYear().toString();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            invoicePreviewText.textContent = `INV-${yyyy}${mm}-####`;
+        }
+
+        function updateFinancePreview() {
+            const purchaseCost = parseFloat(purchaseCostInput.value || '0');
+            const salvageValue = parseFloat(salvageValueInput.value || '0');
+            const usefulLife = parseInt(usefulLifeInput.value || '0', 10);
+
+            const annualDepreciation = usefulLife > 0 ? Math.max(0, purchaseCost - salvageValue) / usefulLife : 0;
+            const initialNetBookValue = Math.max(purchaseCost, 0);
+
+            annualPreview.textContent = formatBhd(annualDepreciation);
+            nbvPreview.textContent = formatBhd(initialNetBookValue);
+        }
+
+        categoryInput.addEventListener('input', updateAssetCodePreview);
+        departmentInput.addEventListener('input', updateAssetCodePreview);
+        purchaseDateInput.addEventListener('input', updateAssetCodePreview);
+        purchaseCostInput.addEventListener('input', updateFinancePreview);
+        salvageValueInput.addEventListener('input', updateFinancePreview);
+        usefulLifeInput.addEventListener('input', updateFinancePreview);
+
+        updateAssetCodePreview();
+        updateInvoicePreview();
+        updateFinancePreview();
+    })();
+</script>
+{% endblock %}

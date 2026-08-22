@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Document - {{ asset.asset_name }}{% endblock %}
+
+{% block content %}
+<div class="page-banner mb-3">
+    <div>
+        <h2>Document Attachment Upload</h2>
+        <p>Attach source files for contractual, procurement, and compliance evidence.</p>
+    </div>
+</div>
+
+<section class="glass-panel">
+    <header class="glass-head"><h5>Upload Form</h5></header>
+    <div class="glass-body">
+        <form method="POST" enctype="multipart/form-data" class="row g-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-8">
+                <label class="form-label">Asset</label>
+                <input type="text" class="form-control" value="{{ asset.asset_name }} ({{ asset.asset_code }})" disabled>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Type <span class="text-danger">*</span></label>
+                <select class="form-select" name="document_type" required>
+                    {% for item in document_types %}
+                        <option value="{{ item }}">{{ item|replace('_', ' ')|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label">File <span class="text-danger">*</span></label>
+                <input type="file" name="document_file" class="form-control" required>
+                <small class="text-muted">Allowed types: pdf, png, jpg, jpeg, doc, docx</small>
+            </div>
+            <div class="col-12">
+                <label class="form-label">Notes</label>
+                <textarea class="form-control" name="notes" rows="3"></textarea>
+            </div>
+            <div class="col-12 d-flex justify-content-end gap-2">
+                <a href="{{ url_for('asset_detail', id=asset.id) }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Upload Document</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
