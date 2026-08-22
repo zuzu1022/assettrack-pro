@@ -10,7 +10,10 @@ try:
     application = _imported_app
     handler = _imported_app
 except Exception:
-    # Minimal fallback if import fails at runtime; kept simple for static analysis.
+    # Minimal fallback if import fails at runtime; log traceback to help debugging.
+    import traceback
+    print("Failed to import fixed_asset_register.app:", flush=True)
+    print(traceback.format_exc(), flush=True)
     from flask import Flask, jsonify
     fallback = Flask(__name__)
 
