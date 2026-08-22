@@ -1,28 +1,35 @@
 import sys
 import os
-from pathlib import Path
 
-# Setup paths
-project_root = Path(__file__).parent.parent
-fixed_asset_path = project_root / "fixed_asset_register"
-sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(fixed_asset_path))
-os.chdir(str(fixed_asset_path))
+# Test imports
+test_results = {}
 
-# Set environment
-os.environ['FLASK_ENV'] = 'production'
-
-from flask import Flask, jsonify
-
-app = Flask(__name__)
-
-# Try to import the real app
 try:
-    from app import app as real_app
-    app = real_app
-    app.config['DEBUG'] = False
-except ImportError as e:
+    import flask
+    test_results['flask'] = 'OK'
+except Exception as e:
+    test_results['flask'] = str(e)
+
+try:
+    from pathlib import Path
+    test_results['pathlib'] = 'OK'
+except Exception as e:
+    test_results['pathlib'] = str(e)
+
+try:
+    from flask import Flask, jsonify
+    app = Flask(__name__)
+    
     @app.route('/')
-    def error():
-        return jsonify({'error': str(e), 'type': 'ImportError'}), 500
+    def index():
+        return jsonify(test_results)
+    
+except Exception as e:
+    from http.server import BaseHTTPRequestHandler
+    class handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(b'{"error": "' + str(e).encode() + b'"}')
 
