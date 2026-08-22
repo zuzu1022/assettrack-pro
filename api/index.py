@@ -1,8 +1,16 @@
 import os
+import sys
+from pathlib import Path
 
 # Statically present top-level names for deployment detection
 application = None
 handler = None
+
+# Ensure the application package is importable when running on the platform
+root = Path(__file__).parent.parent
+sys.path.insert(0, str(root))
+sys.path.insert(0, str(root / "fixed_asset_register"))
+os.chdir(str(root / "fixed_asset_register"))
 
 # Prefer a static import so hosting providers can statically detect the callable.
 try:
