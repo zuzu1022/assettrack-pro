@@ -12,14 +12,15 @@ try:
 except Exception:
     # Minimal fallback if import fails at runtime; log traceback to help debugging.
     import traceback
+    import_error = traceback.format_exc()
     print("Failed to import fixed_asset_register.app:", flush=True)
-    print(traceback.format_exc(), flush=True)
+    print(import_error, flush=True)
     from flask import Flask, jsonify
     fallback = Flask(__name__)
 
     @fallback.route('/')
     def fallback_index():
-        return jsonify({'error': 'Failed to import application'}), 500
+        return jsonify({'error': 'Failed to import application', 'traceback': import_error}), 500
 
     application = fallback
     handler = fallback
