@@ -57,9 +57,20 @@ app.config["WTF_CSRF_ENABLED"] = True
 app.config["UPLOAD_FOLDER"] = os.path.join(app.root_path, "uploads")
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
-csrf = CSRFProtect(app)
-init_db(app)
-os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+try:
+    csrf = CSRFProtect(app)
+except Exception as e:
+    app.logger.warning(f"CSRF protection initialization failed: {e}")
+
+try:
+    init_db(app)
+except Exception as e:
+    app.logger.warning(f"Database initialization failed: {e}")
+
+try:
+    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+except Exception as e:
+    app.logger.warning(f"Could not create upload folder: {e}")
 
 USER_ROLES = ["admin", "viewer"]
 STATUS_OPTIONS = ["Active", "Under Maintenance", "Disposed"]
