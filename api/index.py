@@ -1,35 +1,24 @@
-import sys
 import os
+import sys
+from pathlib import Path
 
-# Test imports
-test_results = {}
+# Setup Python path
+root = Path(__file__).parent.parent
+sys.path.insert(0, str(root))
+sys.path.insert(0, str(root / "fixed_asset_register"))
 
-try:
-    import flask
-    test_results['flask'] = 'OK'
-except Exception as e:
-    test_results['flask'] = str(e)
+# Create minimal Flask app first
+from flask import Flask
 
-try:
-    from pathlib import Path
-    test_results['pathlib'] = 'OK'
-except Exception as e:
-    test_results['pathlib'] = str(e)
+app = Flask(__name__)
 
-try:
-    from flask import Flask, jsonify
-    app = Flask(__name__)
-    
-    @app.route('/')
-    def index():
-        return jsonify(test_results)
-    
-except Exception as e:
-    from http.server import BaseHTTPRequestHandler
-    class handler(BaseHTTPRequestHandler):
-        def do_GET(self):
-            self.send_response(500)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(b'{"error": "' + str(e).encode() + b'"}')
+# Test route
+@app.route('/')
+def hello():
+    return 'Flask app is working!'
+
+# Test route 2  
+@app.route('/test')
+def test():
+    return {'status': 'ok', 'message': 'Flask is running on Vercel'}
 
